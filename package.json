@@ -1,11 +1,21 @@
 {
-  "name": "ass2",
-  "version": "1.0.0",
-  "description": "Assignment 2",
-  "main": "app.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "thanh lam",
-  "license": "ISC"
+    "name": "ass2",
+    "version": "1.0.0",
+    "description": "Assignment 2",
+    "main": "app.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "nodemon app.js",
+        "start-server": "node app.js"
+    },
+    "author": "thanh lam",
+    "license": "ISC",
+    "dependencies": {
+        "body-parser": "^1.20.1",
+        "ejs": "^3.1.8",
+        "express": "^4.18.2",
+        "moment": "^2.29.4",
+        "mongoose": "^6.7.0",
+        "nodemon": "^2.0.20"
+    }
 }
