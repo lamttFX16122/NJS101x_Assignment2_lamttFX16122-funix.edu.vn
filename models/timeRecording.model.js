@@ -26,6 +26,9 @@ const timeRecordingSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     }
+}, {
+    collection: 'timeRecordings',
+    timestamps: true
 })
 
 module.exports = mongoose.model('TimeRecording', timeRecordingSchema);

@@ -50,5 +50,8 @@ const userSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Covid'
     }
+}, {
+    collection: 'users',
+    timestamps: true
 })
 module.exports = mongoose.model('User', userSchema);

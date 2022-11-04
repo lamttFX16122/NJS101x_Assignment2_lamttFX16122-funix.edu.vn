@@ -26,5 +26,8 @@ const timeItemSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'TimeRecording'
     }
+}, {
+    collection: 'timeItems',
+    timestamps: false
 });
 module.exports = mongoose.model('TimeItem', timeItemSchema);

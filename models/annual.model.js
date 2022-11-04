@@ -24,5 +24,8 @@ const annualSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     }
+}, {
+    collection: 'annuals',
+    timestamps: true
 });
 module.exports = mongoose.model('Annual', annualSchema);

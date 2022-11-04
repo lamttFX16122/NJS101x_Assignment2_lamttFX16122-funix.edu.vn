@@ -4,8 +4,8 @@ const bodyParser = require('body-parser');
 const Mongoose = require('mongoose');
 const path = require('path');
 const moment = require('moment');
-const { utc } = require('moment');
-const { ISO_8601 } = require('moment');
+
+
 /* == End Require Lib==*/
 
 /* == Import==*/
@@ -27,7 +27,12 @@ app.set('view', 'views');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-/* == End App Use==*/
+app.get('/', () => {
+        console.log(new Date(Date.now()))
+        console.log(moment().format())
+        console.log(moment())
+    })
+    /* == End App Use==*/
 
 /* == DB Connect==*/
 Mongoose.connect(_DB_URL)
