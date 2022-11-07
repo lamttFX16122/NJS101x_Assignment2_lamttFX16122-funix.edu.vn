@@ -1,33 +1,51 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const moment = require('moment');
+const moment = require("moment");
 
 const timeItemSchema = new Schema({
-    startTime: {
-        type: Date,
-        default: new moment().format()
+    dayTime: {
+        type: String,
+        default: moment().format('YYYY-MM-DD')
     },
-    endTime: {
-        type: Date
-    },
-    numOfHour: {
+    times: [{
+        startTime: {
+            type: Date,
+            default: moment(),
+        },
+        endTime: {
+            type: Date
+        },
+        numOfHour: {
+            type: Number,
+            default: 0
+        },
+        isLoading: {
+            type: Boolean,
+            default: true
+        },
+        workPlace: {
+            type: String,
+            required: true
+        },
+    }, ],
+    totalWorkingTime: {
         type: Number,
         default: 0
     },
-    isLoading: {
-        type: Boolean,
-        default: true
+    lackTime: {
+        type: Number,
+        default: 0
     },
-    workPlace: {
-        type: String,
-        required
+    overTime: {
+        type: Number,
+        default: 0
     },
-    timeRecordingID: {
+    timeRecordingId: {
         type: Schema.Types.ObjectId,
-        ref: 'TimeRecording'
+        ref: "TimeRecording"
     }
 }, {
-    collection: 'timeItems',
+    // collection: "timeItems",
     timestamps: false
 });
-module.exports = mongoose.model('TimeItem', timeItemSchema);
+module.exports = mongoose.model("TimeItem", timeItemSchema);

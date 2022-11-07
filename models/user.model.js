@@ -4,15 +4,19 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
     email: {
         type: String,
-        required
+        required: true
+    },
+    password: {
+        type: String,
+        default: '12345'
     },
     userName: {
         type: String,
-        required
+        required: true
     },
     doB: {
         type: Date,
-        required
+        required: true
     },
     salaryScale: {
         type: Number,
@@ -20,11 +24,11 @@ const userSchema = new Schema({
     },
     startDate: {
         type: Date,
-        required
+        required: true
     },
     department: {
         type: String,
-        required
+        required: true
     },
     annualLeave: {
         type: Number,
@@ -32,26 +36,36 @@ const userSchema = new Schema({
     },
     image: {
         type: String,
-        required
+        required: true
     },
     isAdmin: {
         type: Boolean,
         default: false
     },
-    annualId: {
-        type: Schema.Types.ObjectId,
-        ref: 'Annual'
-    },
-    timeRecordingId: {
-        type: Schema.Types.ObjectId,
-        ref: 'TimeRecording'
-    },
+    annuals: [{
+        annualId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Annual'
+        }
+    }],
+    timeRecordings: [{
+        timeRecordingId: {
+            type: Schema.Types.ObjectId,
+            ref: 'TimeRecording'
+        }
+    }],
     covidId: {
         type: Schema.Types.ObjectId,
         ref: 'Covid'
     }
 }, {
-    collection: 'users',
+    // collection: 'users',
     timestamps: true
 })
+
+
+// userSchema.methods.addTimeRecording=function(_id){
+//     this.timeRecordingIds.push
+//     // "$push": { "childrens": employee._id } 
+// }
 module.exports = mongoose.model('User', userSchema);

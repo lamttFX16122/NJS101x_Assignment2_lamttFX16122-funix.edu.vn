@@ -3,15 +3,15 @@ const Schema = mongoose.Schema;
 const annualSchema = new Schema({
     startDateAnnual: {
         type: Date,
-        required
+        required: true
     },
     endDateAnnual: {
         type: Date,
-        required
+        required: true
     },
     timeAnnual: {
         type: Number,
-        required
+        required: true
     },
     causeAnnual: {
         type: String,
@@ -25,7 +25,7 @@ const annualSchema = new Schema({
         ref: 'User'
     }
 }, {
-    collection: 'annuals',
+    // collection: 'annuals',
     timestamps: true
 });
 module.exports = mongoose.model('Annual', annualSchema);

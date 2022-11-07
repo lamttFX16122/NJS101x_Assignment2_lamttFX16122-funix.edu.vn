@@ -22,7 +22,7 @@ const covidSchema = new Schema({
         ref: 'User'
     }
 }, {
-    collection: 'covids',
+    // collection: 'covids',
     timestamps: true
 });
 module.exports = mongoose.model('Covid', covidSchema);

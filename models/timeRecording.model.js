@@ -2,32 +2,50 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const timeRecordingSchema = new Schema({
-    dateTimeRecording: {
-        type: Date,
-        required
+    year: {
+        type: Number,
+        required: true
+    },
+    month: {
+        type: Number,
+        required: true
     },
     isWorking: {
         type: Boolean,
         default: false
     },
-    totalWorkingTime: {
+    isBlock: {
+        type: Boolean,
+        default: false
+    },
+    numMandatoryDay: {
+        type: Number,
+        required: true
+    },
+    totalWorkingTime_M: {
         type: Number,
         default: 0
     },
-    lackTime: {
+    lackTime_M: {
         type: Number,
         default: 0
     },
-    overTime: {
+    overTime_M: {
         type: Number,
         default: 0
     },
+    timeItems: [{
+        timeItemId: {
+            type: Schema.Types.ObjectId,
+            ref: 'TimeItem'
+        }
+    }],
     userId: {
         type: Schema.Types.ObjectId,
         ref: 'User'
     }
 }, {
-    collection: 'timeRecordings',
+    // collection: 'timeRecordings',
     timestamps: true
 })
 
