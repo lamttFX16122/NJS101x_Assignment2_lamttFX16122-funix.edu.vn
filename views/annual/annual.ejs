@@ -1,0 +1,202 @@
+<%-include('../include/head.ejs')%>
+    <%-include('../include/header.ejs')%>
+        <%-include('../include/sidebar.ejs')%>
+            <!-- ============================================================== -->
+            <!-- Page wrapper  -->
+            <!-- ============================================================== -->
+            <div class="page-wrapper" style="min-height: 250px;">
+                <!-- ============================================================== -->
+                <!-- Bread crumb and right sidebar toggle -->
+                <!-- ============================================================== -->
+                <div class="page-breadcrumb bg-white">
+                    <div class="row">
+                        <div class="col-12 text-center p-2">
+                            <h4 class="page-title text-success">
+                                <i class="fas fa-calendar-alt"></i><span> <%=moment().format('DD/MM/YYYY')%></span>
+                            </h4>
+                        </div>
+                        <hr>
+                    </div>
+                    <!-------------------- Seccion Diem danh ------------------------>
+
+                    <!-- Đang làm việc -->
+
+                    <div class="row align-items-center">
+                        <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+                            <%if(flashMes && flashMes ==='yes'){%>
+                                <h4 class="page-title text-info">
+                                    <i class="far fas fa-child"></i><span> Đăng ký nghỉ thành công!</span>
+                                </h4>
+                                <%}%>
+                                    <%if(flashMes && flashMes!=='yes'){%>
+                                        <h4 class="page-title text-danger">
+                                            <i class="fas fa-frown"></i><span> <%=flashMes%></span>
+                                        </h4>
+                                        <%}%>
+
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                            <div class="d-flex align-items-center justify-content-lg-end justify-content-md-end justify-content-sm-between justify-content-between">
+
+                                <div>
+                                    <button type="button" class="btn btn-primary btn-register" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                        Đăng ký nghỉ
+                                      </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- timeItems.isLoading -->
+                    <!-- End Đang làm việc -->
+                    <!-- Button trigger modal -->
+
+                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Thông tin đăng ký nghỉ</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form class="row g-3 frm-register" action="/reg-Annual" method="POST">
+                                        <!-- Nghi theo gio -->
+
+                                        <div class="col-md-6 col-sm-12 col-xs-12 mt-5 ml-sm-auto">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="isHour" id="gridCheck_isHour">
+                                                <label class="form-check-label" for="gridCheck" name="isHour">
+                                                    Nghỉ theo giờ
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-sm-12 col-xs-12">
+                                            <label for="numHour" class="form-label">Số giờ nghỉ</label>
+                                            <input type="number" disabled class="form-control" id="numHour" name="numHour">
+                                        </div>
+                                        <span class="text-danger err-time" hidden>Giờ phải lớn hơn 0 và nhỏ hơn bằng 8</span>
+                                        <!-- End Nghi theo gio -->
+                                        <div class="col-md-6">
+                                            <label for="fromDate" class="form-label">Từ ngày</label>
+                                            <input type="date" class="form-control" value="<%=moment().format('YYYY-MM-DD')%>" id="fromDate" name="fromDate">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="toDate" class="form-label">Đến ngày</label>
+                                            <input type="date" class="form-control" value="<%=moment().format('YYYY-MM-DD')%>" id="toDate" name="toDate">
+                                        </div>
+                                        <span class="text-danger err-date" hidden>Ngày kết thúc phải lớn hơn ngày bắt đầu</span>
+                                        <div class="col-12">
+                                            <label class="form-label" for="cause">Lý do</label>
+                                            <textarea class="form-control" id="cause" name="cause" rows="4"></textarea>
+                                            <span hidden class="text-danger err-cause">Lý do nghỉ phải nhiều hơn 3 ký tự</span>
+                                        </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    <button type="submit" class="btn btn-primary btn-register">Đăng ký</button>
+                                </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <!-------------------- End Seccion Diem danh ------------------------>
+                </div>
+                <!-- ============================================================== -->
+                <!-- End Bread crumb and right sidebar toggle -->
+                <!-- ============================================================== -->
+                <!-- ============================================================== -->
+                <!-- Container fluid  -->
+                <!-- ============================================================== -->
+                <div class="container-fluid">
+                    <!-- ============================================================== -->
+                    <!-- Start Page Content -->
+                    <!-- ============================================================== -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="white-box">
+                                <%if(data.length>0){%>
+                                    <div>
+                                        <h3 class="box-title">Danh sách đăng ký nghỉ</h3>
+                                    </div>
+                                    <div class="row ">
+                                        <div class="d-flex flex-sm-column align-items-lg-end align-items-md-end align-items-start justify-content-end">
+                                            <!-- <div class="col col-12"> -->
+                                            <h6>Đã đăng ký:
+                                                <%=parseHour(registeredTime,1)%>
+                                            </h6>
+                                            <!-- </div> -->
+                                            <!-- <div class="col col-12"> -->
+                                            <h6>Còn lại:
+                                                <%=parseHour(remainAnnual,1)%>
+                                            </h6>
+                                            <!-- </div> -->
+                                        </div>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table text-nowrap">
+                                            <thead>
+                                                <tr>
+                                                    <th class="border-top-0">#</th>
+                                                    <th class="border-top-0">Thời gian</th>
+                                                    <th class="border-top-0">Từ ngày</th>
+                                                    <th class="border-top-0">Đến ngày</th>
+                                                    <th class="border-top-0">Lý do</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <%data.forEach((item, index)=>{%>
+                                                    <tr>
+                                                        <td>
+                                                            <%=index+1%>
+                                                        </td>
+                                                        <td>
+                                                            <%=parseHour(item.annualId.timeAnnual)%>
+                                                        </td>
+                                                        <td>
+                                                            <%=moment(item.annualId.startDateAnnual).format('DD-MM-YYYY')%>
+                                                        </td>
+                                                        <td>
+                                                            <%=moment(item.annualId.endDateAnnual).format('DD-MM-YYYY')%>
+                                                        </td>
+                                                        <td>
+                                                            <%=item.annualId.causeAnnual%>
+                                                        </td>
+
+                                                    </tr>
+                                                    <%})%>
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <%}else{%>
+                                        <h3 class="box-title">Bạn chưa đăng ký ngày nghỉ nào!</h3>
+                                        <%}%>
+
+                            </div>
+
+                        </div>
+
+                        <!-- TABLE -->
+
+                        <!--End TABLE-->
+                    </div>
+
+
+
+
+                    <!-- ============================================================== -->
+                    <!-- End PAge Content -->
+                    <!-- ============================================================== -->
+                    <!-- ============================================================== -->
+                    <!-- Right sidebar -->
+                    <!-- ============================================================== -->
+                    <!-- .right-sidebar -->
+                    <!-- ============================================================== -->
+                    <!-- End Right sidebar -->
+                    <!-- ============================================================== -->
+                </div>
+                <!-- ============================================================== -->
+                <!-- End Container fluid  -->
+                <!-- ============================================================== -->
+                <%-include('../include/footer.ejs')%>
+                    <%-include('../include/end.ejs')%>

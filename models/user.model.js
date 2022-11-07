@@ -30,6 +30,10 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
+    initialAnnual: {
+        type: Number,
+        default: 0
+    },
     annualLeave: {
         type: Number,
         default: 0

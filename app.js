@@ -7,11 +7,13 @@ const moment = require('moment');
 const multer = require('multer');
 const session = require('express-session');
 const mongoDbSession = require('connect-mongodb-session')(session);
+const flash = require('connect-flash');
 /* == End Require Lib==*/
 
 /* == Import==*/
 const routeAuth = require('./routers/auth.route');
 const routeUser = require('./routers/user.route');
+const routeAnnual = require('./routers/annual.route');
 const routeTimeRecording = require('./routers/timeRecording.route');
 const _User = require('./models/user.model');
 /* == End Import==*/
@@ -53,7 +55,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use(multer({ storage: fileStore, fileFilter: fileFill }).single('image'));
-
+app.use(flash());
 //Session
 app.use(session({
     secret: 'My Secret',
@@ -65,6 +67,7 @@ app.use(session({
 //Route
 app.use(routeAuth);
 app.use(routeUser);
+app.use(routeAnnual);
 app.use(routeTimeRecording);
 
 

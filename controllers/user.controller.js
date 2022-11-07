@@ -28,6 +28,7 @@ module.exports.postAddUser = (req, res, next) => {
                 salaryScale: req.body.salaryScale,
                 startDate: req.body.startDate,
                 department: req.body.department,
+                initialAnnual: req.body.annualLeave * 8,
                 annualLeave: req.body.annualLeave * 8,
                 image: image.path,
             });

@@ -2,11 +2,11 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const annualSchema = new Schema({
     startDateAnnual: {
-        type: Date,
+        type: String,
         required: true
     },
     endDateAnnual: {
-        type: Date,
+        type: String,
         required: true
     },
     timeAnnual: {
@@ -17,6 +17,7 @@ const annualSchema = new Schema({
         type: String,
         default: 'No reason'
     },
+    dayOff: [String],
     isTimeAnnual: { //Nghi theo gio
         type: Boolean
     },
