@@ -40,6 +40,12 @@ const timeRecordingSchema = new Schema({
             ref: 'TimeItem'
         }
     }],
+    annuals: [{
+        annualId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Annual'
+        }
+    }],
     userId: {
         type: Schema.Types.ObjectId,
         ref: 'User'

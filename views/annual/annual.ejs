@@ -113,64 +113,67 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="white-box">
-                                <%if(data.length>0){%>
-                                    <div>
-                                        <h3 class="box-title">Danh sách đăng ký nghỉ</h3>
+                                <div>
+                                    <h3 class="box-title">Danh sách đăng ký nghỉ</h3>
+                                </div>
+                                <div class="row ">
+
+                                    <div class="d-flex flex-sm-column align-items-lg-end align-items-md-end align-items-start justify-content-end">
+                                        <!-- <div class="col col-12"> -->
+                                        <h6>Đã đăng ký:
+                                            <%=parseHour(registeredTime,1)%>
+                                        </h6>
+                                        <!-- </div> -->
+                                        <!-- <div class="col col-12"> -->
+                                        <h6>Còn lại:
+                                            <%=parseHour(remainAnnual,1)%>
+                                        </h6>
+                                        <!-- </div> -->
                                     </div>
-                                    <div class="row ">
-                                        <div class="d-flex flex-sm-column align-items-lg-end align-items-md-end align-items-start justify-content-end">
-                                            <!-- <div class="col col-12"> -->
-                                            <h6>Đã đăng ký:
-                                                <%=parseHour(registeredTime,1)%>
-                                            </h6>
-                                            <!-- </div> -->
-                                            <!-- <div class="col col-12"> -->
-                                            <h6>Còn lại:
-                                                <%=parseHour(remainAnnual,1)%>
-                                            </h6>
-                                            <!-- </div> -->
-                                        </div>
-                                    </div>
-                                    <div class="table-responsive">
-                                        <table class="table text-nowrap">
-                                            <thead>
-                                                <tr>
-                                                    <th class="border-top-0">#</th>
-                                                    <th class="border-top-0">Thời gian</th>
-                                                    <th class="border-top-0">Từ ngày</th>
-                                                    <th class="border-top-0">Đến ngày</th>
-                                                    <th class="border-top-0">Lý do</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <%data.forEach((item, index)=>{%>
+                                </div>
+                                <%data.forEach(month=>{%>
+                                    <%if(month.annuals.length>0){%>
+                                        <div class="table-responsive">
+                                            <table class="table text-nowrap">
+                                                <thead>
                                                     <tr>
-                                                        <td>
-                                                            <%=index+1%>
-                                                        </td>
-                                                        <td>
-                                                            <%=parseHour(item.annualId.timeAnnual)%>
-                                                        </td>
-                                                        <td>
-                                                            <%=moment(item.annualId.startDateAnnual).format('DD-MM-YYYY')%>
-                                                        </td>
-                                                        <td>
-                                                            <%=moment(item.annualId.endDateAnnual).format('DD-MM-YYYY')%>
-                                                        </td>
-                                                        <td>
-                                                            <%=item.annualId.causeAnnual%>
-                                                        </td>
-
+                                                        <th class="border-top-0">#</th>
+                                                        <th class="border-top-0">Thời gian</th>
+                                                        <th class="border-top-0">Từ ngày</th>
+                                                        <th class="border-top-0">Đến ngày</th>
+                                                        <th class="border-top-0">Lý do</th>
                                                     </tr>
-                                                    <%})%>
+                                                </thead>
+                                                <tbody>
+                                                    <%month.annuals.forEach((item, index)=>{%>
+                                                        <tr>
+                                                            <td>
+                                                                <%=index+1%>
+                                                            </td>
+                                                            <td>
+                                                                <%=parseHour(item.annualId.timeAnnual)%>
+                                                            </td>
+                                                            <td>
+                                                                <%=moment(item.annualId.startDateAnnual).format('DD-MM-YYYY')%>
+                                                            </td>
+                                                            <td>
+                                                                <%=moment(item.annualId.endDateAnnual).format('DD-MM-YYYY')%>
+                                                            </td>
+                                                            <td>
+                                                                <%=item.annualId.causeAnnual%>
+                                                            </td>
 
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                        </tr>
+                                                        <%})%>
 
-                                    <%}else{%>
-                                        <h3 class="box-title">Bạn chưa đăng ký ngày nghỉ nào!</h3>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
                                         <%}%>
+
+                                            <% })%>
+
 
                             </div>
 

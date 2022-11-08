@@ -13,7 +13,6 @@ exports.getLogin = (req, res, next) => {
 }
 
 exports.postLogin = (req, res, next) => {
-    console.log(req.body)
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).render('auth/login', {
@@ -40,18 +39,19 @@ exports.postLogin = (req, res, next) => {
                     if (doMatch) {
                         req.session.isLogin = true;
                         req.session.user = user;
-                        return req.session.save(err => {
+                        req.session.save(err => {
                             console.log(err);
                             res.redirect('/');
                         })
+                    } else {
+                        return res.status(422).render('auth/login', {
+                            oldDoc: {
+                                email: req.body.email,
+                                password: req.body.password
+                            },
+                            errMes: 'Email hoặc mật khẩu không hợp lệ!'
+                        });
                     }
-                    return res.status(422).render('auth/login', {
-                        oldDoc: {
-                            email: req.body.email,
-                            password: req.body.password
-                        },
-                        errMes: 'Email hoặc mật khẩu không hợp lệ!'
-                    });
                 })
                 .catch(err => {
                     throw new Error(err);

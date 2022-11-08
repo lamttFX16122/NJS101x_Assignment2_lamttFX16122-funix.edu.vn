@@ -8,6 +8,7 @@ const route = express.Router();
 
 
 route.get('/addUser', _User.getAddUser);
+
 route.post('/addUser', [
     body('email', 'Email không hợp lệ').isEmail().custom((value, { req }) => {
         return _UserModel.findOne({ email: value })
@@ -24,5 +25,25 @@ route.post('/addUser', [
     // body('startDate', 'Ngày bắt đầu bắt buộc nhập').not().isEmpty(),
     // body('annualLeave', 'Số nghỉ phải lớn hơn hoặc bằng 0').isAfter(0)
 ], _User.postAddUser);
+
+
+
+// Add Member
+
+route.get('/addMember', isAuth.isAdmin, _User.getAddMember);
+
+route.post('/addMember', isAuth.isAdmin, [
+    body('email', 'Email không hợp lệ').isEmail().custom((value, { req }) => {
+        return _UserModel.findOne({ email: value })
+            .then(userDoc => {
+                if (userDoc) {
+                    return new Promise.reject('Email exists already, please pick a different one!');
+                }
+            })
+    }),
+    body('password', 'Mật khẩu phải lớn hơn 5 ký tự và không chứa ký tự đặc biệt!').isLength({ min: 5 }).isAlphanumeric().trim(),
+    body('username', 'Họ và tên bắt buộc nhập!').not().isEmpty(),
+    body('doB', 'Ngày sinh không hợp lệ').isBefore(moment().format('YYYY-MM-DD')),
+], _User.postAddMember);
 
 module.exports = route;

@@ -32,7 +32,7 @@ module.exports.getTimeRecording = (req, res, next) => {
         })
         .then(data => {
             if (isNew) { //Them timeRecording moi vao user
-                return _User.updateOne({ id: req.session.user._id, "$push": { timeRecordings: { timeRecordingId: data._id } } })
+                return _User.updateOne({ _id: req.session.user._id, "$push": { timeRecordings: { timeRecordingId: data._id } } })
             }
             return data;
         })
@@ -181,50 +181,6 @@ module.exports.postEndTime = (req, res, next) => {
         .catch(err => console.log(err));
 }
 
-
-
-
-// let isNew = false;
-// _TimeRecording.findOne({
-//         userId: req.session.user._id,
-//         year: parseInt(moment().format('YYYY')),
-//         month: parseInt(moment().format('MM'))
-//     })
-//     // .populate({
-//     //     path: 'timeItems.timeItemId',
-//     //     match: {
-//     //         dayTime: { $eq: moment('2022-11-06').format('YYYY-MM-DD').toString() }
-//     //     }
-//     // })
-//     .then(data => {
-//         if (!data) { //Neu la thang moi thi tao moi thang
-//             let item = new _TimeRecording({
-//                 year: parseInt(moment().format('YYYY')),
-//                 month: parseInt(moment().format('MM')),
-//                 isWorking: false,
-//                 isBlock: false,
-//                 userId: req.session.user._id
-//             })
-//             isNew = true;
-//             return item.save();
-//         }
-//         return data;
-//     })
-//     .then(data => {
-//         if (isNew) { //Them timeRecording moi vao user
-//             return _User.updateOne({ id: req.session.user._id, "$push": { timeRecordings: { timeRecordingId: data._id } } })
-//         }
-//         return data;
-//     })
-//     .then(data => {
-//         //console.log(moment('2022-11-06').format('YYYY-MM-DD').toString())
-//         console.log(data.timeItems)
-//     });
-// res.render('timeRecording/timeRecording.ejs', {
-//     title: 'Điểm danh',
-//     img_user: req.session.user.image,
-//     numActive: 1
-// });
 
 //Func số ngày nghỉ của tháng... trả về tổng số ngày thứ 7 và chủ nhật của tháng
 function numWeekendOfMonth(monthYear) {

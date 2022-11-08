@@ -21,9 +21,9 @@ const annualSchema = new Schema({
     isTimeAnnual: { //Nghi theo gio
         type: Boolean
     },
-    userId: {
+    timeRecordingId: {
         type: Schema.Types.ObjectId,
-        ref: 'User'
+        ref: "TimeRecording"
     }
 }, {
     // collection: 'annuals',

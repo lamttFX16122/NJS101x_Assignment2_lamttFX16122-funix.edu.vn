@@ -1,0 +1,67 @@
+<%-include('../include/head.ejs')%>
+    <%-include('../include/header.ejs')%>
+        <%-include('../include/sidebar.ejs')%>
+            <!-- ============================================================== -->
+            <!-- Page wrapper  -->
+            <!-- ============================================================== -->
+            <div class="page-wrapper" style="min-height: 250px;">
+                <div class="container-fluid">
+                    <!-- ============================================================== -->
+                    <!-- Start Page Content -->
+                    <!-- ============================================================== -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4>Thêm nhân viên</h4>
+                            <form action="/addMember" method="POST" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="text" class="form-control" id="email" name="email">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="password" name="password">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">Họ và Tên</label>
+                                    <input type="text" class="form-control" id="username" name="username">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="doB" class="form-label">Ngày sinh</label>
+                                    <input type="date" class="form-control" id="doB" name="doB">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="salaryScale" class="form-label">Mức lương</label>
+                                    <input type="number" class="form-control" id="salaryScale" name="salaryScale">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="startDate" class="form-label">Ngày bắt đầu</label>
+                                    <input type="date" class="form-control" id="startDate" name="startDate">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Phòng ban</label>
+                                    <select class="form-select mb-3" name="department" aria-label="Default select example">
+                                        <option selected value="NS">Nhân sự</option>
+                                        <option value="Kinh doanh">Kinh doanh</option>
+                                        <option value="IT">IT</option>
+                                        <option value="Kỹ thuật">Kỹ thuật</option>
+                                </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="annualLeave" class="form-label">Số ngày nghỉ</label>
+                                    <input type="number" class="form-control" id="annualLeave" name="annualLeave">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="imageUrl" class="form-label">Hình ảnh</label>
+                                    <input type="file" class="form-control" id="imageUrl" name="image">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Thêm</button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- ============================================================== -->
+                <!-- End Container fluid  -->
+                <!-- ============================================================== -->
+                <%-include('../include/footer.ejs')%>
+                    <%-include('../include/end.ejs')%>

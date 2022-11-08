@@ -43,15 +43,21 @@ const userSchema = new Schema({
         required: true
     },
     isAdmin: {
-        type: Boolean,
-        default: false
+        admin: {
+            type: Boolean,
+            default: false
+        },
+        lstUser: [{
+            memberId: {
+                type: Schema.Types.ObjectId,
+                ref: 'USer'
+            }
+        }]
     },
-    annuals: [{
-        annualId: {
-            type: Schema.Types.ObjectId,
-            ref: 'Annual'
-        }
-    }],
+    ownerId: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
     timeRecordings: [{
         timeRecordingId: {
             type: Schema.Types.ObjectId,
@@ -73,3 +79,6 @@ const userSchema = new Schema({
 //     // "$push": { "childrens": employee._id } 
 // }
 module.exports = mongoose.model('User', userSchema);
+
+
+// isAdmin
