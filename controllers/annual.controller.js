@@ -34,6 +34,13 @@ module.exports.getAnnual = (req, res, next) => {
                     const dataSort = data.sort((a, b) => {
                         return moment(b.month) - moment(a.month)
                     })
+        
+                    dataSort.forEach(x=>{
+                        x.annuals.sort((a,b)=>{
+                            return moment(b.annualId.startDateAnnual)-moment(a.annualId.startDateAnnual)
+                        })
+                    })
+                    console.log(dataSort[0].annuals)
                     res.render('annual/annual.ejs', {
                         title: 'Đăng ký nghỉ',
                         img_user: req.session.user.image,
@@ -71,9 +78,8 @@ module.exports.postRegAnnual = (req, res, next) => {
 
     _User.findById(req.session.user._id)
         .then(user => {
-            console.log(user.annualLeave)
-            _annualLeave = user.annualLeave;
 
+            _annualLeave = user.annualLeave;
             //get list ngay nghi cua thang --t7 va chu nhat
             if (fromDate.format('YYYY-MM') === toDate.format('YYYY-MM')) {
                 listDayWeekend = numWeekendOfMonth(fromDate.format('YYYY-MM'));
@@ -97,7 +103,7 @@ module.exports.postRegAnnual = (req, res, next) => {
                 req.flash('regAnnul', 'Thời gian đăng ký nghỉ đã trùng với ngày nghỉ trong tuần. Vui lòng kiểm tra lại!')
                 return res.redirect('/annual');
             }
-            //cal numHour
+            // ------------------------->>>>> Dang Ky Nghi <<<<<<<-------------------------
             if (isHour && numHour > 0) { //Nghi theo gio
                 totalNumHour = numHour;
 
@@ -349,8 +355,75 @@ module.exports.postRegAnnual = (req, res, next) => {
                     })
                     .catch(err => console.log(err));
             }
+            // ------------------------->>>>> End Dang Ky Nghi <<<<<<<-------------------------
         })
         .catch(err => console.log(err));
+}
+
+// Sua ngay nghi
+module.exports.postEditAnnual = (req, res, next) => {
+    const cause = req.body.cause;
+    const numHour = req.body.numHour ? parseInt(req.body.numHour) : 0;
+    const idAnnuaEdit=req.body.annual_id;
+    let _annualLeave = 0; //So ngay nghi con lai cua User
+
+    //======================= Check date logic======================
+    //GET annualLeave
+    _User.findById(req.session.user._id)
+        .then(user => {
+            _annualLeave = user.annualLeave;
+            // ------------------------->>>>> Edit Ky Nghi <<<<<<<-------------------------
+            //Lay thoi gian cu
+            _Annual.findById(idAnnuaEdit)
+            .then(data=>{
+                _annualLeave-=(numHour-data.timeAnnual)
+               data.causeAnnual=cause;
+               data.timeAnnual=numHour;
+               data.isTimeAnnual=numHour<8?true:false;
+                data.save((err,doc)=>{
+                    if(err){
+                        console.log(err);
+                    }
+                    user.annualLeave=_annualLeave;
+                    user.save((err,_doc)=>{
+                        if(err){
+                            console.log(err);
+                        }
+                        req.flash('regAnnul', 'edited')
+                        res.redirect('/annual');
+                    })
+                })
+            })
+            .catch(err=>console.log(err));
+            // ------------------------->>>>> Edit Dang Ky Nghi <<<<<<<-------------------------
+        })
+        .catch(err => console.log(err));
+}
+
+//Xoa ngay nghi
+module.exports.removeAnnual=(req,res,next)=>{
+    const id_removeAnnual=req.body.id_removeAnnual;
+
+    _User.findById(req.session.user._id)
+    .then(user => {
+        _annualLeave = user.annualLeave;
+    _Annual.findByIdAndDelete(id_removeAnnual)
+    .then(result=>{
+       user.annualLeave+=result.timeAnnual;
+       user.save((err,doc)=>{
+        if(err){
+            console.log(err)
+        }
+        _TimeRecording.updateOne({_id: result.timeRecordingId},{$pull: {annuals:{annualId:id_removeAnnual}}})
+        .then(updated=>{
+            req.flash('regAnnul', 'deleted')
+            res.redirect('/annual');
+        }).catch(err=>console.log(err));
+       })
+    })
+    .catch(err=>console.log(err));     
+    })
+    .catch(err => console.log(err));
 }
 
 //Func tách từ ngày đến ngày thành các ngày chi tiết

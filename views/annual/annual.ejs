@@ -28,7 +28,17 @@
                                     <i class="far fas fa-child"></i><span> Đăng ký nghỉ thành công!</span>
                                 </h4>
                                 <%}%>
-                                    <%if(flashMes && flashMes!=='yes'){%>
+                                <%if(flashMes && flashMes ==='edited'){%>
+                                    <h4 class="page-title text-info">
+                                        <i class="far fas fa-child"></i><span> Thay đổi thời gian nghỉ thành công!</span>
+                                    </h4>
+                                    <%}%>
+                                    <%if(flashMes && flashMes ==='deleted'){%>
+                                        <h4 class="page-title text-info">
+                                            <i class="far fas fa-child"></i><span> Xóa thời gian nghỉ thành công!</span>
+                                        </h4>
+                                        <%}%>
+                                    <%if(flashMes && flashMes!=='yes' && flashMes !=='edited' && flashMes !=='deleted'){%>
                                         <h4 class="page-title text-danger">
                                             <i class="fas fa-frown"></i><span> <%=flashMes%></span>
                                         </h4>
@@ -91,13 +101,37 @@
                                         </div>
                                 </div>
                                 <div class="modal-footer">
+                                    <input type="hidden" id="annual_id" value="" name="annual_id">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                                    <button type="submit" class="btn btn-primary btn-register">Đăng ký</button>
+                                    <button type="submit" class="btn btn-primary btn-register-save">Lưu</button>
                                 </div>
-                                </form>
+                            </form>
                             </div>
                         </div>
                     </div>
+
+                    <!-- ------------------Confirm Remove-------------- -->
+                    <div class="modal fade" id="exampleModal_confirm" tabindex="-1" aria-labelledby="exampleModal_confirm" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title" id="exampleModalLabel">Xác nhận</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <h4 class="modal-title fs-5">Bạn có muốn xóa ngày nghỉ đang chọn?</h4>
+                                </div>
+                                <div class="modal-footer">                                  
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                <form action="/remove-annual" method="POST">
+                                    <input type="hidden" id="id_removeAnnual" value="" name="id_removeAnnual">
+                                    <button type="submit" class="btn btn-primary btn-remove">Xóa</button>
+                                </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ------------------End Confirm Remove --------- -->
                     <!-------------------- End Seccion Diem danh ------------------------>
                 </div>
                 <!-- ============================================================== -->
@@ -131,26 +165,35 @@
                                         <!-- </div> -->
                                     </div>
                                 </div>
+                                <div class="table-responsive">
+                                    <table class="table text-nowrap tbl_Annual">
+                                        <thead>
+                                            <tr>
+                                                <th class="border-top-0">#</th>
+                                                <th class="border-top-0">Thời gian</th>
+                                                <th class="border-top-0">Từ ngày</th>
+                                                <th class="border-top-0">Đến ngày</th>
+                                                <th class="border-top-0">Lý do</th>
+                                                <th class="border-top-0"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <%let count =0%>
                                 <%data.forEach(month=>{%>
-                                    <%if(month.annuals.length>0){%>
-                                        <div class="table-responsive">
-                                            <table class="table text-nowrap">
-                                                <thead>
-                                                    <tr>
-                                                        <th class="border-top-0">#</th>
-                                                        <th class="border-top-0">Thời gian</th>
-                                                        <th class="border-top-0">Từ ngày</th>
-                                                        <th class="border-top-0">Đến ngày</th>
-                                                        <th class="border-top-0">Lý do</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
+                                    <%if(month.annuals.length>0){%>   
+                                        <tr>
+                                            <td colspan="5">
+                                                <h4 class="box-title"><%=`${month.month}-${month.year}`%></h4>
+                                            </td>
+                                        </tr>                 
+                                        <%count++%>                 
                                                     <%month.annuals.forEach((item, index)=>{%>
+                                                        <%count++%> 
                                                         <tr>
-                                                            <td>
+                                                            <td id="<%=item.annualId.isTimeAnnual%>">
                                                                 <%=index+1%>
                                                             </td>
-                                                            <td>
+                                                            <td id="<%=item.annualId.timeAnnual%>">
                                                                 <%=parseHour(item.annualId.timeAnnual)%>
                                                             </td>
                                                             <td>
@@ -162,19 +205,29 @@
                                                             <td>
                                                                 <%=item.annualId.causeAnnual%>
                                                             </td>
+                                                            <td id="<%=item.annualId._id%>">
+                                                                <%if(!month.isBlock){%>
+                                                                    <div>
+                                                                        <%if(item.annualId.timeAnnual<=8){%>
+                                                                            <button id="<%=count-1%>" class="btn btn-info btn_edit_Annual">Sửa</button>
+                                                                        <%}%>
+                                                                        <button id="<%=count-1%>" class="btn btn-danger btn_remove_Annual">Xóa</button>
+                                                                    </div>    
+                                                                <%}%>
+                                                            </td>
 
                                                         </tr>
-                                                        <%})%>
+                                                    <%})%>
 
-                                                </tbody>
-                                            </table>
-                                        </div>
 
                                         <%}%>
 
                                             <% })%>
 
 
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
 
                         </div>
