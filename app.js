@@ -16,6 +16,7 @@ const routeUser = require('./routers/user.route');
 const routeAnnual = require('./routers/annual.route');
 const routeTimeRecording = require('./routers/timeRecording.route');
 const _User = require('./models/user.model');
+const routeCovid=require('./routers/covid.route');
 /* == End Import==*/
 
 /* == Param==*/
@@ -68,6 +69,7 @@ app.use(session({
 app.use(routeAuth);
 app.use(routeUser);
 app.use(routeAnnual);
+app.use(routeCovid);
 app.use(routeTimeRecording);
 
 

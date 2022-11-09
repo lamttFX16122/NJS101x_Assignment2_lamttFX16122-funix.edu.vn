@@ -15,6 +15,7 @@ const covidSchema = new Schema({
     covid: [{
         numCovid: Number,
         dateCovid: Date,
+        symptomCovid: String,
         statusCovid: Boolean
     }],
     userId: {

@@ -40,7 +40,6 @@ module.exports.getAnnual = (req, res, next) => {
                             return moment(b.annualId.startDateAnnual)-moment(a.annualId.startDateAnnual)
                         })
                     })
-                    console.log(dataSort[0].annuals)
                     res.render('annual/annual.ejs', {
                         title: 'Đăng ký nghỉ',
                         img_user: req.session.user.image,
