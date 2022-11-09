@@ -16,23 +16,42 @@
         <!-------------------- Message Acction ------------------------>
         <div class="row">
             <div class="col-12">
-                <%if(flashMes && flashMes ==='Covidadded'){%>
+                <!-- ===================== Mes Hypothermia=================== -->
+                <%if(flashMes && flashMes ==='Hypothermia_added'){%>
                 <h4 class="page-title text-info"><i class="far fas fa-child"></i><span> Thêm thông tin thân nhiệt thành công!</span></h4>
-                <%}%> <%if(flashMes && flashMes ==='Covidedited'){%>
+                <%}%> <%if(flashMes && flashMes ==='Hypothermia_adited'){%>
                 <h4 class="page-title text-info"><i class="far fas fa-child"></i><span> Thay đổi thông tin thân nhiệt thành công!</span></h4>
-                <%}%> <%if(flashMes && flashMes ==='Coviddeleted'){%>
+                <%}%> <%if(flashMes && flashMes ==='Hypothermia_deleted'){%>
                 <h4 class="page-title text-info"><i class="far fas fa-child"></i><span> Xóa thông tin thân nhiệt thành công!</span></h4>
                 <%}%>
+                <!-- ===================== End Mes Hypothermia=============== -->
+
+                <!-- ===================== Mes Vaccine======================= -->
+                <%if(flashMes && flashMes ==='Vac_added'){%>
+                    <h4 class="page-title text-info"><i class="far fas fa-child"></i><span> Thêm thông tin Vaccine thành công!</span></h4>
+                    <%}%> <%if(flashMes && flashMes ==='Vac_edited'){%>
+                    <h4 class="page-title text-info"><i class="far fas fa-child"></i><span> Thay đổi thông tin Vaccine thành công!</span></h4>
+                    <%}%> <%if(flashMes && flashMes ==='Vac_deleted'){%>
+                    <h4 class="page-title text-info"><i class="far fas fa-child"></i><span> Xóa thông tin Vaccine thành công!</span></h4>
+                    <%}%>
+                <!-- ===================== End Mes Vaccine=================== -->
+
+                <!-- ===================== Mes Covid========================= -->
+                <%if(flashMes && flashMes ==='isCovid_added'){%>
+                    <h4 class="page-title text-info"><i class="far fas fa-child"></i><span> Thêm thông tin nhiễm Covid thành công!</span></h4>
+                    <%}%> <%if(flashMes && flashMes ==='isCovid_edited'){%>
+                    <h4 class="page-title text-info"><i class="far fas fa-child"></i><span> Thay đổi thông tin nhiễm Covid thành công!</span></h4>
+                    <%}%> <%if(flashMes && flashMes ==='isCovid_deleted'){%>
+                    <h4 class="page-title text-info"><i class="far fas fa-child"></i><span> Xóa thông tin nhiễm Covid thành công!</span></h4>
+                    <%}%>
+                <!-- ===================== End Mes Covid===================== -->
             </div>
         </div>
 
         <!-------------------- End Message Action ------------------------>
     </div>
 
-    <!-- ============================================================== -->
-    <!-- End Bread crumb and right sidebar toggle -->
-    <!-- ============================================================== -->
-    <!-- ============================================================== -->
+
     <!-- Container fluid  -->
     <!-- ============================================================== -->
     <div class="container-fluid">
@@ -47,15 +66,15 @@
                     <div class="card p-3">
                         <nav>
                             <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
-                                <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Thông tin thân nhiệt</button>
-                                <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Thông tin Vaccine</button>
-                                <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-contact" type="button" role="tab" aria-controls="nav-contact" aria-selected="false">Thông tin nhiễm Covid</button>
+                                <button class="nav-link <%=_activeTab===0? 'active' : ''%>" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="<%=_activeTab===0? true : false%>">Thông tin thân nhiệt</button>
+                                <button class="nav-link <%=_activeTab===1? 'active' : ''%>" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="<%=_activeTab===1? true : false%>">Thông tin Vaccine</button>
+                                <button class="nav-link <%=_activeTab===2? 'active' : ''%>" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-contact" type="button" role="tab" aria-controls="nav-contact" aria-selected="<%=_activeTab===2? true : false%>">Thông tin nhiễm Covid</button>
                             </div>
                         </nav>
                         <!-- Content Tab -->
                         <div class="tab-content" id="nav-tabContent">
                             <!-- --------------------------- Hypothermia----------------------->
-                            <div class="tab-pane fade active show" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                            <div class="tab-pane fade <%=_activeTab===0? 'active show' : ''%>" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
                                 <div class="row pb-3">
                                     <div class="col-12 text-end">
                                         <button type="button" id="btn_addHypothermia" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal_Hypothermia">Thêm thông tin</button>
@@ -76,7 +95,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <%let hypoCount=0%> <%data.hypothermia.forEach((item,index)=>{%> <%hypoCount++%>
+                                               <%data.hypothermia.forEach((item,index)=>{%>
                                                 <tr>
                                                     <td id="<%=data._id%>"><%=index+1%></td>
                                                     <td id="<%=item.timeHypothermia%>"><%=item.temperature%></td>
@@ -102,30 +121,98 @@
                             <!-- --------------------------- End Hypothermia------------------->
 
                             <!-- --------------------------- Vaccine--------------------------->
-                            <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+                            <div class="tab-pane fade <%=_activeTab===1? 'active show' : ''%>" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
                                 <div class="row pb-3">
                                     <div class="col-12 text-end">
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal_Vaccine">Thêm thông tin</button>
+                                        <button type="button" class="btn btn-primary btn-register-Vac" data-bs-toggle="modal" data-bs-target="#exampleModal_Vaccine">Thêm thông tin</button>
                                     </div>
                                 </div>
-                                <p>
-                                    <strong>This is some placeholder content the Profile tab's associated content.</strong>
-                                    Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling. You can use it with tabs, pills, and any other <code>.nav</code>-powered navigation.
-                                </p>
+                                <!-- ==========Table Vaccine=========== -->
+                                <div class="row">
+                                    <%if(data.vaccine.length>0){%>
+                                    <div class="table-responsive">
+                                        <table class="table text-nowrap tbl_Vaccine">
+                                            <thead>
+                                                <tr>
+                                                    <th class="border-top-0">#</th>
+                                                    <th class="border-top-0">Mũi thứ</th>
+                                                    <th class="border-top-0">Thời gian</th>
+                                                    <th class="border-top-0">Loại Vaccine</th>
+                                                    <th class="border-top-0"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <%data.vaccine.forEach((item,index)=>{%> 
+                                                <tr>
+                                                    <td id="<%=data._id%>"><%=index+1%></td>
+                                                    <td><%=item.numVaccine%></td>
+                                                    <td id="<%=moment(item.dateVaccine).format('YYYY-MM-DD')%>"><%=moment(item.dateVaccine).format('DD/MM/YYYY')%></td>
+                                                    <td><%=item.typeVaccine%></td>
+                                                    <td id="<%=item._id%>">
+                                                        <div>
+                                                            <button id="<%=index%>" class="btn btn-info btn_edit_Vac">Sửa</button>
+                                                            <button id="<%=index%>" class="btn btn-danger btn_remove_Vac">Xóa</button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <%})%>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <%}else{%>
+                                    <h3 class="page-title">Bạn chưa đăng ký thông tin Vaccine nào!</h3>
+                                    <%}%>
+                                </div>
+                                <!-- ========End Table Vaccine========= -->
                             </div>
                             <!-- --------------------------- End Vaccine----------------------->
 
                             <!-- -------------------------- Is Covid--------------------------->
-                            <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
+                            <div class="tab-pane fade <%=_activeTab===2? 'active show' : ''%>" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
                                 <div class="row pb-3">
                                     <div class="col-12 text-end">
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal_Covid">Thêm thông tin</button>
+                                        <button type="button" class="btn btn-primary btn-register-covid" data-bs-toggle="modal" data-bs-target="#exampleModal_Covid">Thêm thông tin</button>
                                     </div>
                                 </div>
-                                <p>
-                                    <strong>This is some placeholder content the Contact tab's associated content.</strong>
-                                    Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling. You can use it with tabs, pills, and any other <code>.nav</code>-powered navigation.
-                                </p>
+                               <!-- ==========Table Covid=========== -->
+                               <div class="row">
+                                <%if(data.covid.length>0){%>
+                                <div class="table-responsive">
+                                    <table class="table text-nowrap tbl_isCovid">
+                                        <thead>
+                                            <tr>
+                                                <th class="border-top-0">#</th>
+                                                <th class="border-top-0">Lần nhiễm</th>
+                                                <th class="border-top-0">Thời gian</th>
+                                                <th class="border-top-0">Triệu chứng</th>
+                                                <th class="border-top-0">Trạng thái</th>
+                                                <th class="border-top-0"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <%data.covid.forEach((item,index)=>{%> 
+                                            <tr>
+                                                <td id="<%=data._id%>"><%=index+1%></td>
+                                                <td><%=item.numCovid%></td>
+                                                <td id="<%=moment(item.dateCovid).format('YYYY-MM-DD')%>"><%=moment(item.dateCovid).format('DD/MM/YYYY')%></td>
+                                                <td><%=item.symptomCovid%></td>
+                                                <td id="<%=item.statusCovid%>"><%=item.statusCovid? 'Đang nhiễm' : 'Đã hết'%></td>
+                                                <td id="<%=item._id%>">
+                                                    <div>
+                                                        <button id="<%=index%>" class="btn btn-info btn_edit_Covid">Sửa</button>
+                                                        <button id="<%=index%>" class="btn btn-danger btn_remove_Covid">Xóa</button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <%})%>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <%}else{%>
+                                <h3 class="page-title">Bạn chưa đăng ký thông tin Vaccine nào!</h3>
+                                <%}%>
+                            </div>
+                            <!-- ========End Table Covid========== -->
                             </div>
                             <!-- -------------------------- End Is Covid----------------------->
                         </div>
@@ -181,23 +268,24 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <form class="row g-3 frm-register" action="/reg-Annual" method="POST">
-                                        <!-- End Nghi theo gio -->
+                                    <form class="row g-3 frm-register-vaccine" action="/vaccine" method="POST">
                                         <div class="col-md-6">
-                                            <label for="fromDate" class="form-label">Mũi thứ</label>
-                                            <input type="number" step="1" class="form-control" value="" id="fromDate" name="fromDate" />
+                                            <label for="numVac" class="form-label">Mũi thứ</label>
+                                            <input type="number" step="1" class="form-control" value="" id="numVac" name="numVac" />
                                         </div>
+                                        <span class="text-danger err-numVac" hidden>Mũi tiêm không hợp lệ</span>
                                         <div class="col-md-6">
-                                            <label for="toDate" class="form-label">Ngày</label>
-                                            <input type="date" class="form-control" value="<%=moment().format('YYYY-MM-DD')%>" id="toDate" name="toDate" />
+                                            <label for="dateVac" class="form-label">Ngày</label>
+                                            <input type="date" class="form-control" value="<%=moment().format('YYYY-MM-DD')%>" id="dateVac" name="dateVac" />
                                         </div>
                                         <div class="col-12">
-                                            <label for="toDate" class="form-label">Loại Vaccine</label>
-                                            <input type="text" class="form-control" value="" id="toDate" name="toDate" />
+                                            <label for="typeVac" class="form-label">Loại Vaccine</label>
+                                            <input type="text" class="form-control" value="" id="typeVac" name="typeVac" />
                                         </div>
-                                        <span class="text-danger err-date" hidden>Tình trạng sức khỏe</span>
+                                        <span class="text-danger err-typeVac" hidden>Loại Vaccine không hợp lệ</span>
                                         <div class="modal-footer">
-                                            <!-- <input type="hidden" id="annual_id" value="" name="annual_id"> -->
+                                            <input type="hidden" id="vac_covid_id" value="" name="vac_covid_id" />
+                                            <input type="hidden" id="vac_id" value="" name="vac_id" />
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                                             <button type="submit" class="btn btn-primary">Lưu</button>
                                         </div>
@@ -217,32 +305,32 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <form class="row g-3 frm-register" action="/reg-Annual" method="POST">
-                                        <!-- End Nghi theo gio -->
-
+                                    <form class="row g-3 frm-register-covid" action="/is-covid" method="POST">
+                                     
                                         <div class="col-12">
                                             <div class="form-check d-flex justify-content-end">
-                                                <input class="form-check-input" type="checkbox" name="isHour" id="gridCheck_isHour" />
-                                                <label class="form-check-label" for="gridCheck_isHour" name="isHour"> &nbsp;Đang nhiễm? </label>
+                                                <input class="form-check-input" type="checkbox" name="check_isCovid" id="check_isCovid" />
+                                                <label class="form-check-label" for="check_isCovid"> &nbsp;Đang nhiễm? </label>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <label for="fromDate" class="form-label">Lần nhiễm</label>
-                                            <input type="number" class="form-control" step="1" value="" id="fromDate" name="fromDate" />
+                                            <label for="numCovid" class="form-label">Lần nhiễm</label>
+                                            <input type="number" class="form-control" step="1" value="" id="numCovid" name="numCovid" />
                                         </div>
+                                        <span hidden class="text-danger err-numCovid">Lần nhiễm không hợp lệ</span>
                                         <div class="col-md-6">
-                                            <label for="toDate" class="form-label">Ngày</label>
-                                            <input type="date" class="form-control" value="<%=moment().format('YYYY-MM-DD')%>" id="toDate" name="toDate" />
+                                            <label for="dateCovid" class="form-label">Ngày</label>
+                                            <input type="date" class="form-control" value="<%=moment().format('YYYY-MM-DD')%>" id="dateCovid" name="dateCovid" />
                                         </div>
 
-                                        <span class="text-danger err-date" hidden>Tình trạng sức khỏe</span>
                                         <div class="col-12">
-                                            <label class="form-label" for="cause">Triệu chứng</label>
-                                            <textarea class="form-control" id="cause" name="cause" rows="4"></textarea>
-                                            <span hidden class="text-danger err-cause">Lý do nghỉ phải nhiều hơn 3 ký tự</span>
+                                            <label class="form-label" for="symptomCovid">Triệu chứng</label>
+                                            <textarea class="form-control" id="symptomCovid" name="symptomCovid" rows="4"></textarea>
+                                            <span hidden class="text-danger err-symptomCovid">Triệu trứng phải nhiều hơn 3 ký tự</span>
                                         </div>
                                         <div class="modal-footer">
-                                            <!-- <input type="hidden" id="annual_id" value="" name="annual_id"> -->
+                                            <input type="hidden" id="covid_id_root" value="" name="covid_id">
+                                            <input type="hidden" id="isCovid_id" value="" name="isCovid_id">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                                             <button type="submit" class="btn btn-primary">Lưu</button>
                                         </div>
@@ -276,6 +364,55 @@
                         </div>
                     </div>
                     <!-- ------------------End Confirm Remove Hypothermia--------- -->
+
+                        <!-- ------------------Confirm Remove Vaccine-------------- -->
+                        <div class="modal fade" id="exampleModal_confirm_Vac" tabindex="-1" aria-labelledby="exampleModal_confirm_Vac" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title" id="exampleModalLabel">Xác nhận</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <h4 class="modal-title fs-5">Bạn có muốn xóa thông tin Vaccine?</h4>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                        <form action="/remove-vaccine" method="POST">
+                                            <input type="hidden" id="remove_Vac_id" value="" name="remove_Vac_id" />
+                                            <input type="hidden" id="remove_Covid_id" value="" name="remove_Covid_id"/>
+                                            <button type="submit" class="btn btn-primary">Xóa</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- ------------------End Confirm Remove Vaccine--------- -->
+
+                        <!-- ------------------Confirm Remove Covid-------------- -->
+                        <div class="modal fade" id="exampleModal_confirm_Covid" tabindex="-1" aria-labelledby="exampleModal_confirm_Covid" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title" id="exampleModalLabel">Xác nhận</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <h4 class="modal-title fs-5">Bạn có muốn xóa thông tin nhiễm Covid?</h4>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                        <form action="/remove-covid" method="POST">
+                                            <input type="hidden" id="remove_isCovid_id" value="" name="remove_isCovid_id" />
+                                            <input type="hidden" id="isCovid_id_root" value="" name="isCovid_id"/>
+                                            <button type="submit" class="btn btn-primary">Xóa</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- ------------------End Confirm Remove Covid--------- -->
+    
 
                     <!-- -------------End Tab Nav-------------- -->
                 </div>
