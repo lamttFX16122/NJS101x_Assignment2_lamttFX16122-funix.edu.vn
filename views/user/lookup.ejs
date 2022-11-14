@@ -1,0 +1,322 @@
+        <%-include('../include/head.ejs')%> <%-include('../include/header.ejs')%>
+        <%-include('../include/sidebar.ejs')%>
+        <!-- ============================================================== -->
+        <!-- Page wrapper  -->
+        <!-- ============================================================== -->
+        <div class="page-wrapper" style="min-height: 250px">
+          <!-- ============================================================== -->
+          <!-- Bread crumb and right sidebar toggle -->
+          <!-- ============================================================== -->
+          <div class="page-breadcrumb bg-white">
+            <div class="row">
+              <div class="col-12 text-center p-2">
+                <h4 class="page-title text-success">
+                  <i class="fas fa-calendar-alt"></i><span> <%=moment().format('DD/MM/YYYY')%></span>
+                </h4>
+              </div>
+              <hr />
+            </div>
+            
+            <div class="row">
+              <div class="col-lg-6 col-12 p-2">
+                <p>Mã nhân viên: <b><%=data.userInfo._id%></b></p>
+                <p>Họ và tên: <b><%=data.userInfo.userName%></b></p>
+                
+              </div>
+              <div class="col-lg-6 col-12 p-2">
+                <p>Người quản lý: <b><%=data.userInfo.ownerId.userName%> - (<%=data.userInfo.ownerId._id%>)</b></p>
+                <p>Phòng ban: <b><%=data.userInfo.department%></b></p>
+              </div>
+              <hr />
+            </div>
+            <!-------------------- Message Acction ------------------------>
+            <div class="row">
+              <div class="col-12"></div>
+            </div>
+            
+            <!-------------------- End Message Action ------------------------>
+          </div>
+          
+          <!-- Container fluid  -->
+          <!-- ============================================================== -->
+          <div class="container-fluid">
+            <!-- ============================================================== -->
+            <!-- Start Page Content -->
+            <!-- ============================================================== -->
+            <div class="row">
+              <div class="col-md-12">
+                <div class="white-box">
+                  <!-- -------------Tab Nav------------------ -->
+                  
+                  <div class="card p-3">
+                    <nav>
+                      <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
+                        <button class="nav-link <%=_activeTab===0? 'active' : ''%>" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="<%=_activeTab===0? true : false%>">
+                          Thông tin giờ làm
+                        </button>
+                        <button class="nav-link <%=_activeTab===1? 'active' : ''%>" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="<%=_activeTab===1? true : false%>">
+                          Chi tiết lương tháng
+                        </button>
+                      </div>
+                    </nav>
+                    <!-- Content Tab -->
+                    <div class="tab-content" id="nav-tabContent">
+                      <!-- --------------------------- Hypothermia----------------------->
+                      <div class="tab-pane fade <%=_activeTab===0? 'active show' : ''%>" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                        
+                        
+                        <!-- ======= Filter And Search======= -->
+                        
+                        <!-- ======= End Filter And Search=== -->
+                        
+                        <div class="row pb-3">
+                          <!-- <form class="frm_sort_lookup" action="?page=<%=currentPage%>&pagesize=<%=pagesize%>" method="GET">
+                            <div class="row"> -->
+                          <div class="col-lg-10 col-md-10 col-12">
+                            <div class="form-check">
+                              <input class="form-check-input" type="checkbox" value="" name="check_sortDay" id="check_sortDay">
+                              <label class="form-check-label" for="check_sortDay">
+                                Sắp xếp theo ngày?
+                              </label>
+                            </div>
+                            
+                            <div class="mx-5 checked-sort-date" hidden>
+                              <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" checked value="0">
+                                <label class="form-check-label" for="inlineRadio1">Tăng dần</label>
+                              </div>
+                              <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="1">
+                                <label class="form-check-label" for="inlineRadio2">Giảm dần</label>
+                              </div>
+                            </div>
+                            
+                            <div class="form-check">
+                              <input class="form-check-input" type="checkbox" value="" id="check_sortPlace" name="check_sortPlace">
+                              <label class="form-check-label" for="check_sortPlace">
+                                Sắp xếp theo nơi làm việc?
+                              </label>
+                            </div>
+                          </div>
+                          <div class="col-lg-2 col-md-2 col-12 my-2 text-end">
+                            <!-- <button type="button" class="btn btn-primary mx-2" id="btn_sort">Sắp xếp</button> -->
+                            <a class="btn btn-primary" id="link_sort" href="?page=<%=currentPage%>&pagesize=<%=pagesize%>">Sắp xếp</a>
+                          </div>
+                          <!-- </div>
+                          </form> -->
+                          <hr>
+                        </div>
+                        
+                        <!-- ==========Table Hypothermia=========== -->
+                        <div class="row">
+                          <%data.timeRecording.forEach((timeRecordingItem)=>{%>
+                          <%timeRecordingItem.dayTimes.forEach((dayTimeItem)=>{%>
+                          <%if(dayTimeItem.times.length>0){%>
+                          <%dayTimeItem.times.forEach(timeItem=>{%>
+                          <div class="card border border-1 border-primary rounded-3">
+                            <div class="card-body">
+                              <div class="table-responsive">
+                                <table class="table text-nowrap">
+                                  <thead>
+                                    <tr>
+                                      <th class="border-top-0">Ngày</th>
+                                      <!--Link-->
+                                      <th class="border-top-0">Giờ bắt đầu</th>
+                                      <th class="border-top-0">Giờ kết thúc</th>
+                                      <th class="border-top-0">Nơi làm việc</th>
+                                      <th class="border-top-0">Thời gian làm</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr>
+                                      <td> <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#exampleModal-<%=dayTimeItem.dayTime%>">
+                                          <%=moment(dayTimeItem.dayTime).format('DD/MM/YYYY')%>
+                                        </button></td>
+                                      <!--Link-->
+                                      <td><%=moment(timeItem.startTime).format('HH:mm:ss')%></td>
+                                      <td><%=moment(timeItem.endTime).format('HH:mm:ss')%></td>
+                                      <td><%=timeItem.workPlace%></td>
+                                      <td><%=parseHour(timeItem.numOfHour, 0)%></td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          </div>
+                          <%})%>
+                          <%}%>
+                            <%})%>
+                          <%})%>
+                        </div>
+                        <!-- -----------------Phan trang------------------ -->
+                        <nav aria-label="Page navigation example">
+                          <div class="row">
+                            <div class="col-md-6 col-12 table-responsive">
+                              <ul class="pagination justify-content-md-start justify-content-lg-start justify-content-center">
+                                <!-- Previous page -->
+                                <%if(currentPage==1){%>
+                                <li class="page-item disabled">
+                                  <a class="page-link" href="?page=1&pagesize=<%=pagesize%>">Trang đầu</a>
+                                </li>
+                                <%}else{%>
+                                <li class="page-item">
+                                  <a class="page-link" href="?page=1&pagesize=<%=pagesize%>">Trang đầu</a>
+                                </li>
+                                <%}%>
+                              <!-- Item -->
+                              <%let i= currentPage> 3 ? currentPage-2:1%>
+                                
+                                <%if(i!==1){%>
+                                <li class="page-item"><a class="page-link" href="#">...</a></li>
+                                <%}%>
+                                <%for(;i<=currentPage+2 && i<=lastPage; i++){%>
+                                <%if(i==currentPage){%>
+                                <li class="page-item active"><a class="page-link" href="?page=<%=i%>&pagesize=<%=pagesize%>"><%=i%></a></li>
+                                <%}else{%>
+                                <li class="page-item"><a class="page-link" href="?page=<%=i%>&pagesize=<%=pagesize%>"><%=i%></a></li>
+                                <%}%>
+
+                                        <%if(i==currentPage+2 && i<lastPage){%>
+                                <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+                                <%}%>
+                                    <%}%>
+                                
+                                <!-- LAST ITEM -->
+                                <%if(currentPage==lastPage){%>
+                                <li class="page-item disabled">
+                                  <a class="page-link" href="?page=<%=lastPage%>&pagesize=<%=pagesize%>">Trang cuối</a>
+                                </li>
+                                <%}else{%>
+                                <li class="page-item">
+                                  <a class="page-link" href="?page=<%=lastPage%>&pagesize=<%=pagesize%>">Trang cuối</a>
+                                </li>
+                                <%}%>
+                              </ul>
+                            </div>
+                            <div class="col-md-6 col-12">
+                              <ul class="pagination justify-content-end align-items-center">
+                                <li class="page-item <%=pagesize===5? 'active': ''%>"><a class="page-link" href="?pagesize=5">5</a></li>
+                                <li class="page-item <%=pagesize===10? 'active': ''%>"><a class="page-link" href="?pagesize=10">10</a></li>
+                                <li class="page-item <%=pagesize===20? 'active': ''%>"><a class="page-link" href="?pagesize=20">20</a></li>
+                                <li class="page-item"><span>&nbsp; Số dòng hiển thị</span></li>
+                              </ul>
+                            </div>
+                          </div>
+                        </nav>
+                        <!-- -----------------End Phan trang------------------ -->
+                        <!-- ========End able Hypothermia========== -->
+                      </div>
+                      <!-- --------------------------- End Hypothermia------------------->
+                      
+                      <!-- --------------------------- Vaccine--------------------------->
+                      <div class="tab-pane fade <%=_activeTab===1? 'active show' : ''%>" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+                        <!-- <div class="row pb-3">
+                          <div class="col-12 text-end">
+                            <button type="button" class="btn btn-primary btn-register-Vac" data-bs-toggle="modal" data-bs-target="#exampleModal_Vaccine">
+                              Thêm thông tin
+                            </button>
+                          </div>
+                        </div> -->
+                        <!-- ==========Table Vaccine=========== -->
+                        <div class="row">
+                          <%data.timeRecording.forEach((timeRecordingItem)=>{%>
+                          <div class="card border border-1 border-primary rounded-3">
+                            <div class="card-body">
+                              <div class="row">
+                                <div class="<%=timeRecordingItem.annuals.length>0? 'col-lg-6': ''%> col-12">
+                                  <h5><b>Tháng <%=timeRecordingItem.month%>/<%=timeRecordingItem.year%></b></h5>
+                                  <p>Số ngày làm bắt buộc: <%=timeRecordingItem.numMandatoryDay%> ngày (~ <%=timeRecordingItem.numMandatoryDay*8%> giờ)</p>
+                                  <p>Tổng số ngày nghỉ đã đăng ký: <%=timeRecordingItem.totalAnnual_M%></p>
+                                  <p>Tổng thời gian đã làm: <%=timeRecordingItem.totalWorkingTime_M%></p>
+                                  <p>Tổng thời gian làm dư: <%=timeRecordingItem.overTime_M%></p>
+                                  <p>Tổng thời gian làm thiếu: <%=timeRecordingItem.lackTime_M%></p>
+                                  <h5><b>LƯƠNG: <%=timeRecordingItem.salaryMonth%></b></h5>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                  <%if(timeRecordingItem.annuals.length>0){%>
+                                  <h5><b>Thông tin đăng ký nghỉ trong tháng</b></h5>
+                                  <%timeRecordingItem.annuals.forEach((annual, index)=>{%>
+                                  <div class="row">
+                                    <div class="col-1 border-end border-primary"><b><%=index+1%></b></div>
+                                    <div class="col-11">
+                                      <p>Bắt đầu: <%=moment(annual.annualId.startDateAnnual).format('DD/MM/YYYY')%></p>
+                                      <p>Kết thúc: <%=moment(annual.annualId.endDateAnnual).format('DD/MM/YYYY')%></p>
+                                      <p>Thời gian nghỉ: <%=parseHour(annual.annualId.timeAnnual, 1)%></p>
+                                      <p>Lý do: <%=annual.annualId.causeAnnual%></p>
+                                      <p>Ngày đăng ký: <%=moment(annual.annualId.createdAt).format('HH:mm-DD/MM/YYYY')%></p>
+                                    </div>
+                                  </div>
+                                  <%if(index+1<timeRecordingItem.annuals.length){%>
+                                  <hr>
+                                  <%}%>                                
+                                        <%})%>
+                                  <%}%>   
+                                      </div>
+                            </div>
+                                </div>
+                              </div>
+                            <%})%>
+                                </div>
+                                <!-- ========End Table Vaccine========= -->
+                              </div>
+                              <!-- --------------------------- End Vaccine----------------------->
+                            </div>
+                          </div>
+                          
+                          
+                          <!-- =============== Modal tong hop ngay=================== -->
+                          <%data.timeRecording.forEach(timeRecordingItem=>{%>
+                          <%timeRecordingItem.dayTimes.forEach(dayItem=>{%>
+                          <%if(dayItem.times.length>0){%>
+                          <!-- Modal -->
+                          <div class="modal fade" id="exampleModal-<%=dayItem.dayTime%>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 class="modal-title page-title" id="exampleModalLabel"><b>Thông tin chi tiết</b></h5>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                  <div class="row">
+                                    <div class="<%=dayItem.dayOff!==null? 'col-lg-6': ''%> col-12">
+                                      <h4><b>Thông tin ngày làm</b></h4>
+                                      <p>Ngày: <%=moment(dayItem.dayTime).format('DD/MM/YYYY')%></p>
+                                      <p>Số lần điểm danh: <%=dayItem.times.length%></p>
+                                      <p>Tổng thời gian đã làm: <%=parseHour(dayItem.totalWorkingTime, 0)%></p>
+                                      <p>Thời gian thiếu: <%=parseHour(dayItem.lackTime, 0)%></p>
+                                      <p>Thời gian dư: <%=parseHour(dayItem.overTime, 0)%></p>
+                                    </div>
+                                    <!-- Thong tin ngay nghi -->
+                                    <div class="col-lg-6 col-12">
+                                      <%if(dayItem.dayOff!==null){%>
+                                      <h4><b>Thông tin đăng ký nghỉ</b></h4>
+                                      <p>Bắt đầu: <%=moment(dayItem.dayOff.startDateAnnual).format('DD/MM/YYYY')%></p>
+                                      <p>Kết thúc: <%=moment(dayItem.dayOff.endDateAnnual).format('DD/MM/YYYY')%></p>
+                                      <p>Thời gian nghỉ: <%=parseHour(dayItem.dayOff.timeAnnual, 1)%></p>
+                                      <p>Lý do: <%=dayItem.dayOff.causeAnnual%></p>
+                                      <p>Ngày đăng ký: <%=moment(dayItem.dayOff.createdAt).format('HH:mm-DD/MM/YYYY')%></p>
+                                      <%}%>     
+                                </div>                         
+                         </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <%}%>
+                                      <%})%>
+                                      <%})%>
+                                      <!-- =============== End Modal tong hop ngay=============== -->
+                                      
+                                      <!-- -------------End Tab Nav-------------- -->
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <!-- ============================================================== -->
+                              <!-- End Container fluid  -->
+                              <!-- ============================================================== -->
+                              <%-include('../include/footer.ejs')%> <%-include('../include/end.ejs')%>
+                            </div>

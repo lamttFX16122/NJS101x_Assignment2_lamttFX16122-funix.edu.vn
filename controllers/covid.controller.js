@@ -338,31 +338,151 @@ module.exports.exportCovidPDF = (req, res, next) => {
             const filePath = path.join("documentPDF", fileName);
 
             const docPdf = new PDFDocument({ size: "A4", margin: 50 });
-            generateHypothermiaTable(docPdf, data.hypothermia);
+            generateHeader(docPdf);
+            generateUserInfo(docPdf, req.session.user);
+            generateHypothermiaTable(docPdf, data);
             docPdf.end();
             docPdf.pipe(fs.createWriteStream(filePath));
+            res.type("application/pdf");
+            //Dowload pdf
+            // res.setHeader("Content-Disposition", 'attachment; filename="' + fileName + '"');
+            // res.setHeader("Content-Disposition", 'inline; filename="' + fileName + '"');
             docPdf.pipe(res);
-
-            // doc
         })
         .catch((err) => console.log(err));
 };
 
 // ================== Func custom PDF ====================
-const generateHypothermiaTable = (doc, hypo) => {
-    const marginTop = 300;
+const generateHeader = (doc) => {
+    doc.font("public/font/timesbd.ttf").fontSize(20).text("THÔNG TIN KHAI BÁO COVID", { align: "center" }).moveDown();
+};
 
+const generateUserInfo = (doc, user) => {
+    doc.fillColor("#444444").font("public/font/timesbd.ttf").fontSize("15").text("NHÂN VIÊN", 50, 100);
+    generateHr(doc, 125, 550);
+    const userInfoTop = 140;
+
+    doc.font("public/font/times.ttf")
+        .fontSize(13)
+        .text("Mã nhân viên: ", 50, userInfoTop)
+        //_id
+        .font("public/font/timesbd.ttf")
+        .text(user._id, 150, userInfoTop)
+
+        .font("public/font/times.ttf")
+        .fontSize(13)
+        // user Name
+        .text("Họ và tên: ", 50, userInfoTop + 15)
+        .text(user.userName, 150, userInfoTop + 15)
+        // dob
+        .text("Ngày sinh: ", 50, userInfoTop + 30)
+        .text(moment(user.doB).format("DD/MM/YYYY"), 150, userInfoTop + 30)
+        //department
+        .text("Phòng ban: ", 50, userInfoTop + 45)
+        .text(user.department, 150, userInfoTop + 45)
+
+        //department
+        .text("Ngày vào làm: ", 50, userInfoTop + 60)
+        .text(moment(user.startDate).format("DD/MM/YYYY"), 150, userInfoTop + 60);
+    generateHr(doc, userInfoTop + 90, 550);
+};
+const generateHypothermiaTable = (doc, data) => {
+    let marginTop = 270;
+    let marginTopNext = 0;
+    let marginTopNextCovid = 0;
+    // ===========Thông tin thân nhiệt=======================
+    doc.fillColor("#444444").font("public/font/timesbd.ttf").fontSize("15").text("Thông tin thân nhiệt", 50, marginTop);
+    generateHr(doc, marginTop + 20, 550);
     doc.font("public/font/timesbd.ttf");
     // Table title
-    generateTableRow(doc, marginTop, 13, "#", "Nhiệt độ", "Thời gian", "Tình trạng");
+    generateTableRow_Hypo(doc, marginTop + 35, 13, "#", "Nhiệt độ", "Thời gian", "Tình trạng");
+
+    generateHr(doc, marginTop + 60, 500);
     // table content
     doc.font("public/font/times.ttf");
-    hypo.forEach((item, index) => {
-        const position = marginTop + (index + 1) * 20;
-        generateTableRow(doc, position, 10, index + 1, item.temperature, `${item.timeHypothermia}-${moment(item.dateHypothermia).format("DD/MM/YYYY")}`, item.affection);
+    let _countHypo = 0;
+    data.hypothermia.forEach((item, index) => {
+        let position = marginTop + 60 + (_countHypo + 1) * 15;
+        generateTableRow_Hypo(doc, position, 10, index + 1, item.temperature, `${item.timeHypothermia}-${moment(item.dateHypothermia).format("DD/MM/YYYY")}`, item.affection);
+        generateHr(doc, position + 20, 500);
+        marginTop += 20;
+        marginTopNext = position + 20;
+        _countHypo++;
+        if (position > 650) {
+            _countHypo = 0;
+            marginTop = 20;
+            doc.addPage();
+        }
     });
+    // =========== End Thông tin thân nhiệt====================
+
+    // =========== Thông tin Vaccine =========================
+    let marginVaccine = marginTopNext + 10;
+
+    doc.fillColor("#444444").font("public/font/timesbd.ttf").fontSize("15").text("Thông tin Vaccine", 50, marginVaccine);
+    generateHr(doc, marginVaccine + 20, 550);
+    doc.font("public/font/timesbd.ttf");
+    // Table title
+    generateTableRow_Vac(doc, marginVaccine + 35, 13, "#", "Mũi tiêm", "Thời gian", "Loại Vaccine");
+
+    generateHr(doc, marginVaccine + 60, 500);
+    // table content
+    let _countVac = 0;
+    doc.font("public/font/times.ttf");
+    data.vaccine.forEach((item, index) => {
+        const position = marginVaccine + 60 + (_countVac + 1) * 15;
+        generateTableRow_Vac(doc, position, 10, index + 1, item.numVaccine, moment(item.dateVaccine).format("DD/MM/YYYY"), item.typeVaccine);
+        generateHr(doc, position + 20, 500);
+        marginVaccine += 20;
+        marginTopNext = position + 20;
+        _countVac++;
+        if (position > 650) {
+            _countVac = 0;
+            marginVaccine = 20;
+            doc.addPage();
+        }
+    });
+    // =========== End Thông tin Vaccinet =====================
+
+    // =========== Is Covid ===================================
+
+    marginTopNextCovid = marginTopNext + 10;
+    doc.fillColor("#444444").font("public/font/timesbd.ttf").fontSize("15").text("Thông tin dương tính Covid", 50, marginTopNextCovid);
+    generateHr(doc, marginTopNextCovid + 20, 550);
+    doc.font("public/font/timesbd.ttf");
+    // Table title
+    generateTableRow_Covid(doc, marginTopNextCovid + 35, 13, "#", "Lần nhiễm", "Thời gian", "Tình trạng", "Triệu chứng");
+
+    generateHr(doc, marginTopNextCovid + 60, 500);
+    // table content
+    doc.font("public/font/times.ttf");
+    let _countCovid = 0; //set for newPage
+    data.covid.forEach((item, index) => {
+        const position = marginTopNextCovid + 60 + (_countCovid + 1) * 15;
+        generateTableRow_Covid(doc, position, 10, index + 1, item.numCovid, moment(item.dateCovid).format("DD/MM/YYYY"), item.statusCovid === true ? "Đang nhiễm" : "Đã hết", item.symptomCovid);
+        generateHr(doc, position + 20, 500);
+        marginTopNextCovid += 20;
+        _countCovid++;
+        if (position > 650) {
+            _countCovid = 0;
+            marginTopNextCovid = 20;
+            doc.addPage();
+        }
+    });
+
+    // ===========  End Is Covid ==============================
 };
-const generateTableRow = (doc, y, fontsize, index, temperature, date, affection) => {
-    doc.fontSize(fontsize).text(index, 50, y, { width: 10, align: "center" }).text(temperature, 70, y, { width: 80, align: "center" }).text(date, 120, y, { width: 150, align: "center" }).text(affection, 250, y);
+
+const generateTableRow_Hypo = (doc, y, fontsize, index, temperature, date, affection) => {
+    doc.fontSize(fontsize).text(index, 50, y, { width: 10, align: "center" }).text(temperature, 70, y, { width: 80, align: "center" }).text(date, 120, y, { width: 150, align: "center" }).text(affection, 250, y, { width: 300 });
+};
+const generateTableRow_Vac = (doc, y, fontsize, index, numVac, dateVac, typeVac) => {
+    doc.fontSize(fontsize).text(index, 50, y, { width: 10, align: "center" }).text(numVac, 70, y, { width: 80, align: "center" }).text(dateVac, 120, y, { width: 150, align: "center" }).text(typeVac, 250, y, { width: 300 });
+};
+const generateTableRow_Covid = (doc, y, fontsize, index, numCovid, dateCovid, statusCovid, symptomCovid) => {
+    doc.fontSize(fontsize).text(index, 50, y, { width: 10, align: "center" }).text(numCovid, 70, y, { width: 80, align: "center" }).text(dateCovid, 120, y, { width: 150, align: "center" }).text(statusCovid, 200, y, { width: 150, align: "center" }).text(symptomCovid, 340, y, { width: 300 });
+};
+const generateHr = (doc, y, sizeHr) => {
+    doc.strokeColor("#aaaaaa").lineWidth(1).moveTo(50, y).lineTo(sizeHr, y).stroke();
 };
 // ================== End Func custom PDF ================
