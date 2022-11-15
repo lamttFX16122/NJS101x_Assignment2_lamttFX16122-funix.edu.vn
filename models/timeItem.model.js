@@ -33,4 +33,5 @@ const timeItemSchema = new Schema(
         timestamps: false,
     }
 );
+
 module.exports = mongoose.model("TimeItem", timeItemSchema);

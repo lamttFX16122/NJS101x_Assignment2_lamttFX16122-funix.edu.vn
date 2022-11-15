@@ -92,7 +92,6 @@ module.exports.getTimeRecording = (req, res, next) => {
                         monthInfo.day_id = "";
                         monthInfo.newpie = false;
                     }
-                    console.log(monthInfo);
                     res.render("timeRecording/timeRecording.ejs", {
                         title: "Điểm danh",
                         img_user: req.session.user.image,

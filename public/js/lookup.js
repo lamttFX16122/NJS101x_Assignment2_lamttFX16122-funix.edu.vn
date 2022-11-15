@@ -18,19 +18,13 @@ $(document).ready(() => {
         if ($('#check_sortPlace').is(':checked')) {
             str_sort += '&sortWorkPlace=' + true
         }
+        console.log(str_sort)
         $('#link_sort').attr('href', str_sort)
-        // $('#link_sort').trigger("click");
     })
-    // http://localhost:3002/lookup?page=2&pagesize=5
-    // $('.frm_sort_lookup').submit(function (e) {
-    //     if ($('#check_sortDay').is(':checked')) {
-    //         alert('aaaaaaaaaaaa')
-    //     }
-    //     else {
-    //         return
-    //     }
 
-    //     e.preventDefault();
-    // });
+    // $('#btn-search').click(() => {
+    //     const txt = `?search=${$('#txt-search-input').val()}`;
+    //     $('#btn-search').attr('href', txt);
+    // })
 
 })
