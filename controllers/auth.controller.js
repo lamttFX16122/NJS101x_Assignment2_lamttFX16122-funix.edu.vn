@@ -3,11 +3,16 @@ const _User = require('../models/user.model');
 const { validationResult } = require('express-validator');
 
 exports.getLogin = (req, res, next) => {
+    let flashMes = req.flash('requireLogin');
+    if (flashMes.length > 0) {
+        flashMes = flashMes[0];
+    }
     res.render('auth/login', {
         oldDoc: {
             email: '',
             password: ''
         },
+        flashMes: flashMes,
         errMes: null
     });
 }
@@ -20,6 +25,7 @@ exports.postLogin = (req, res, next) => {
                 email: req.body.email,
                 password: req.body.password
             },
+            flashMes: null,
             errMes: 'Email hoặc mật khẩu không hợp lệ!'
         });
     }
@@ -31,6 +37,7 @@ exports.postLogin = (req, res, next) => {
                         email: req.body.email,
                         password: req.body.password
                     },
+                    flashMes: null,
                     errMes: 'Email hoặc mật khẩu không hợp lệ!'
                 });
             }
@@ -59,7 +66,6 @@ exports.postLogin = (req, res, next) => {
         })
         .catch(err => console.log(err))
 }
-
 exports.postLogout = (req, res, next) => {
     req.session.destroy((err) => {
         console.log(err);

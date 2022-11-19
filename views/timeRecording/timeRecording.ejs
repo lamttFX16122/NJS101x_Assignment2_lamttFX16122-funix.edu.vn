@@ -1,147 +1,126 @@
-<%-include('../include/head.ejs')%> <%-include('../include/header.ejs')%> <%-include('../include/sidebar.ejs')%>
-<!-- ============================================================== -->
-<!-- Page wrapper  -->
-<!-- ============================================================== -->
+<%-include('../include/head.ejs')%>
+<%-include('../include/header.ejs')%>
+<%-include('../include/sidebar.ejs')%>
 <div class="page-wrapper" style="min-height: 250px">
-    <!-- ============================================================== -->
-    <!-- Bread crumb and right sidebar toggle -->
-    <!-- ============================================================== -->
-    <div class="page-breadcrumb bg-white">
-        <div class="row">
-            <div class="col-12 text-center p-2">
-                <h4 class="page-title text-success"><i class="fas fa-calendar-alt"></i><span> <%=moment().format('DD/MM/YYYY')%></span></h4>
-            </div>
-            <hr />
+  <div class="page-breadcrumb bg-white">
+    <div class="row">
+      <div class="col-12 text-center p-2">
+        <h4 class="page-title text-success"><i class="fas fa-calendar-alt"></i><span> <%=moment().format('DD/MM/YYYY')%></span></h4>
+      </div>
+      <hr />
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <span>
+          <h5 class="page-title"><%=userName%> - <%=userId%></h5>
+        </span>
+      </div>
+    </div>
+    <!-------------------- Seccion Diem danh ------------------------>
+    <%if(timeItems.isLoading!==-1){%>
+    <!-- Đang làm việc -->
+    
+    <div class="row align-items-center">
+      <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
+        <h4 class="page-title text-info"><i class="far fa-smile"></i><span> Bạn đang làm việc!</span></h4>
+      </div>
+      <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
+        <div class="d-flex align-items-center justify-content-lg-end justify-content-md-end justify-content-sm-between justify-content-between">
+          <div class="mx-lg-4 mx-md-4"><i class="fas fa-clock"></i><span><%=timeItems.times[timeItems.isLoading].timeItemId.startTime?moment(timeItems.times[timeItems.isLoading].timeItemId.startTime).format('HH:mm:ss'):''%></span></div>
+          <div class="mx-lg-4 mx-md-4"><i class="fas fa-location-arrow"></i><span><%=timeItems.times[timeItems.isLoading].timeItemId.workPlace?timeItems.times[timeItems.isLoading].timeItemId.workPlace:''%></span></div>
+          <div>
+            <form action="/end-time" method="POST">
+              <input type="hidden" value="<%=timeItems.monthInfo_id %>" name="month_id" />
+              <input type="hidden" value="<%=timeItems.day_id %>" name="day_id" />
+              <input type="hidden" value="<%=timeItems.times[timeItems.isLoading].timeItemId._id?timeItems.times[timeItems.isLoading].timeItemId._id:'' %>" name="item_id" />
+              <button type="submit" class="btn btn-primary">Kết thúc</button>
+            </form>
+          </div>
         </div>
-        <!-------------------- Seccion Diem danh ------------------------>
-        <%if(timeItems.isLoading!==-1){%>
-        <!-- Đang làm việc -->
-
-        <div class="row align-items-center">
-            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
-                <h4 class="page-title text-info"><i class="far fa-smile"></i><span> Bạn đang làm việc!</span></h4>
-            </div>
-            <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
-                <div class="d-flex align-items-center justify-content-lg-end justify-content-md-end justify-content-sm-between justify-content-between">
-                    <div class="mx-lg-4 mx-md-4"><i class="fas fa-clock"></i><span><%=timeItems.times[timeItems.isLoading].timeItemId.startTime?moment(timeItems.times[timeItems.isLoading].timeItemId.startTime).format('HH:mm:ss'):''%></span></div>
-                    <div class="mx-lg-4 mx-md-4"><i class="fas fa-location-arrow"></i><span><%=timeItems.times[timeItems.isLoading].timeItemId.workPlace?timeItems.times[timeItems.isLoading].timeItemId.workPlace:''%></span></div>
-                    <div>
-                        <form action="/end-time" method="POST">
-                            <input type="hidden" value="<%=timeItems.monthInfo_id %>" name="month_id" />
-                            <input type="hidden" value="<%=timeItems.day_id %>" name="day_id" />
-                            <input type="hidden" value="<%=timeItems.times[timeItems.isLoading].timeItemId._id?timeItems.times[timeItems.isLoading].timeItemId._id:'' %>" name="item_id" />
-                            <button type="submit" class="btn btn-primary">Kết thúc</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- timeItems.isLoading -->
-        <!-- End Đang làm việc -->
-        <%}else{%>
-        <!-- Chưa làm việc -->
-        <div class="row align-items-center">
-            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
-                <h4 class="page-title text-danger"><i class="fas fa-moon"></i><span> Bạn chưa làm việc!</span></h4>
-            </div>
-            <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
-                <form action="/startTime" method="POST">
-                    <div class="d-flex align-items-center justify-content-lg-end justify-content-md-end justify-content-sm-between justify-content-between my-2">
-                        <select class="form-select w-lg-25 w-md-25 w-sm-25 mx-lg-4 mx-md-2 w-50 mx-2" aria-label="Default select example" name="workPlace">
-                            <option value="Công ty" selected>Công ty</option>
-                            <option value="Khách hàng">Khách hàng</option>
-                            <option value="Nhà">Nhà</option>
-                        </select>
-                        <input type="hidden" value="<%=timeItems.monthInfo_id %>" name="month_id" />
-                        <input type="hidden" value="<%=timeItems.day_id %>" name="day_id" />
-                        <button class="btn btn-primary">Bắt đầu</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <!-- End Chưa làm việc -->
-        <%}%>
+      </div>
+    </div>
+    <!-- timeItems.isLoading -->
+    <!-- End Đang làm việc -->
+    <%}else{%>
+    <!-- Chưa làm việc -->
+    <div class="row align-items-center">
+      <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
+        <h4 class="page-title text-danger"><i class="fas fa-moon"></i><span> Bạn chưa làm việc!</span></h4>
+      </div>
+      <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
+        <form action="/startTime" method="POST">
+          <div class="d-flex align-items-center justify-content-lg-end justify-content-md-end justify-content-sm-between justify-content-between my-2">
+            <select class="form-select w-lg-25 w-md-25 w-sm-25 mx-lg-4 mx-md-2 w-50 mx-2" aria-label="Default select example" name="workPlace">
+              <option value="Công ty" selected>Công ty</option>
+              <option value="Khách hàng">Khách hàng</option>
+              <option value="Nhà">Nhà</option>
+            </select>
+            <input type="hidden" value="<%=timeItems.monthInfo_id %>" name="month_id" />
+            <input type="hidden" value="<%=timeItems.day_id %>" name="day_id" />
+            <button class="btn btn-primary">Bắt đầu</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- End Chưa làm việc -->
+    <%}%>
+  
         <!-------------------- End Seccion Diem danh ------------------------>
     </div>
-    <!-- ============================================================== -->
-    <!-- End Bread crumb and right sidebar toggle -->
-    <!-- ============================================================== -->
-    <!-- ============================================================== -->
-    <!-- Container fluid  -->
-    <!-- ============================================================== -->
     <div class="container-fluid">
-        <!-- ============================================================== -->
-        <!-- Start Page Content -->
-        <!-- ============================================================== -->
         <div class="row">
             <div class="col-md-12">
                 <div class="white-box">
                     <%if(timeItems.times.length>0){%>
-                    <div>
-                        <h3 class="box-title">Số lần điểm danh trong ngày</h3>
-                    </div>
-                    <div class="row">
-                        <div class="d-flex flex-sm-column align-items-lg-end align-items-md-end align-items-start justify-content-end">
-                            <!-- <div class="col col-12"> -->
-                            <h6>Đã làm: <%=parseHour(timeItems.totalWorkingTime,0)%></h6>
-                            <!-- </div> -->
-                            <!-- <div class="col col-12"> -->
-                            <h6>Còn thiếu: <%=parseHour(timeItems.lackTime,0)%></h6>
-                            <!-- </div> -->
-                            <!-- <div class="col col-12"> -->
-                            <h6>Làm thêm: <%=parseHour(timeItems.overTime,0)%></h6>
-                            <!-- </div> -->
-                        </div>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table text-nowrap">
-                            <thead>
-                                <tr>
-                                    <th class="border-top-0">#</th>
-                                    <th class="border-top-0">Địa điểm</th>
-                                    <th class="border-top-0">Bắt đầu</th>
-                                    <th class="border-top-0">Kết thúc</th>
-                                    <th class="border-top-0">Tổng</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <%timeItems.times.forEach((item, index)=>{%>
-                                <tr>
-                                    <td><%=index+1%></td>
-                                    <td><%=item.timeItemId.workPlace%></td>
-                                    <td><%=moment(item.timeItemId.startTime).format('HH:mm:ss')%></td>
-                                    <td><%=item.timeItemId.endTime?moment(item.timeItemId.endTime).format('HH:mm:ss'):''%></td>
-                                    <td><%=item.timeItemId.endTime?parseHour(item.timeItemId.numOfHour,0): 'Chưa kết thúc'%></td>
-                                </tr>
-                                <%})%>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <%}else{%>
-                    <h3 class="box-title">Bạn chưa điểm danh lần nào trong ngày</h3>
-                    <%}%>
+    <div>
+      <h3 class="box-title">Số lần điểm danh trong ngày</h3>
+    </div>
+    <div class="row">
+      <div class="d-flex flex-sm-column align-items-lg-end align-items-md-end align-items-start justify-content-end">
+        <!-- <div class="col col-12"> -->
+        <h6>Đã làm: <%=parseHour(timeItems.totalWorkingTime,0)%></h6>
+        <!-- </div> -->
+        <!-- <div class="col col-12"> -->
+        <h6>Còn thiếu: <%=parseHour(timeItems.lackTime,0)%></h6>
+        <!-- </div> -->
+        <!-- <div class="col col-12"> -->
+        <h6>Làm thêm: <%=parseHour(timeItems.overTime,0)%></h6>
+        <!-- </div> -->
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="table text-nowrap">
+        <thead>
+          <tr>
+            <th class="border-top-0">#</th>
+            <th class="border-top-0">Địa điểm</th>
+            <th class="border-top-0">Bắt đầu</th>
+            <th class="border-top-0">Kết thúc</th>
+            <th class="border-top-0">Tổng</th>
+          </tr>
+        </thead>
+        <tbody>
+          <%timeItems.times.forEach((item, index)=>{%>
+          <tr>
+            <td><%=index+1%></td>
+            <td><%=item.timeItemId.workPlace%></td>
+            <td><%=moment(item.timeItemId.startTime).format('HH:mm:ss')%></td>
+            <td><%=item.timeItemId.endTime?moment(item.timeItemId.endTime).format('HH:mm:ss'):''%></td>
+            <td><%=item.timeItemId.endTime?parseHour(item.timeItemId.numOfHour,0): 'Chưa kết thúc'%></td>
+          </tr>
+          <%})%>
+        </tbody>
+      </table>
+    </div>
+    <%}else{%>
+    <h3 class="box-title">Bạn chưa điểm danh lần nào trong ngày</h3>
+    <%}%>
                 </div>
             </div>
-
-            <!-- TABLE -->
-
-            <!--End TABLE-->
         </div>
 
-        <!-- ============================================================== -->
-        <!-- End PAge Content -->
-        <!-- ============================================================== -->
-        <!-- ============================================================== -->
-        <!-- Right sidebar -->
-        <!-- ============================================================== -->
-        <!-- .right-sidebar -->
-        <!-- ============================================================== -->
-        <!-- End Right sidebar -->
-        <!-- ============================================================== -->
+     
     </div>
-    <!-- ============================================================== -->
-    <!-- End Container fluid  -->
-    <!-- ============================================================== -->
-    <%-include('../include/footer.ejs')%> <%-include('../include/end.ejs')%>
-</div>
+    <%-include('../include/footer.ejs')%>
+    <%-include('../include/end.ejs')%>
+  </div>

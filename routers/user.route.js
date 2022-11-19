@@ -58,4 +58,9 @@ route.post(
 route.get("/lookup", isAuth.isUser, _User.getLookup);
 // ==================== End Lookup=====================
 
+// Get Info
+route.get("/info", isAuth.isUser, _User.getInfo);
+//Change Image
+
+route.post("/change-img", isAuth.isUser, _User.changeImage);
 module.exports = route;

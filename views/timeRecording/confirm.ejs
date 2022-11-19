@@ -1,0 +1,58 @@
+<%-include('../include/head.ejs')%>
+<%-include('../include/header.ejs')%> <%-include('../include/sidebar.ejs')%>
+<div class="page-wrapper" style="min-height: 250px">
+  <div class="page-breadcrumb bg-white">
+    <div class="row">
+      <div class="col-12 text-center p-2">
+        <h4 class="page-title text-success"><i class="fas fa-calendar-alt"></i><span> <%=moment().format('DD/MM/YYYY')%></span></h4>
+      </div>
+      <hr />
+    </div>
+  </div>
+  <!-------------------- Message Acction ------------------------>
+  <!-- Container fluid  -->
+  <!-- ============================================================== -->
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="white-box">
+          <!-- -------------Tab Nav------------------ -->
+          <div class="table-responsive">
+            <table class="table text-nowrap">
+              <thead>
+                <tr>
+                  <th class="border-top-0">#</th>
+                  <th class="border-top-0">Mã nhân viên</th>
+                  <th class="border-top-0">Tên nhân viên</th>
+                  <th class="border-top-0">Ngày sinh</th>
+                  <th class="border-top-0">Email</th>
+                  <th class="border-top-0"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <%data.isAdmin.lstUser.forEach((item,index)=>{%>
+                <tr>
+                  <td><%=index+1%></td>
+                  <td><%=item.memberId._id%></td>
+                  <td><%=item.memberId.userName%></td>
+                  <td><%=moment(item.memberId.doB).format('DD/MM/YYYY')%></td>
+                  <td><%=item.memberId.email%></td>
+                  <td>
+                    <a type="button" class="btn btn-primary" href="?member=<%=item.memberId._id%>">Chọn xác thực</a>
+                  </td>
+                </tr>
+                <%})%>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- -------------End Tab Nav-------------- -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ============================================================== -->
+  <!-- End Container fluid  -->
+  <!-- ============================================================== -->
+  <%-include('../include/footer.ejs')%> <%-include('../include/end.ejs')%>
+</div>

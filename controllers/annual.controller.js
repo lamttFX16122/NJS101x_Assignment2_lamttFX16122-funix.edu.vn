@@ -49,6 +49,7 @@ module.exports.getAnnual = (req, res, next) => {
                         remainAnnual: annualLeave,
                         registeredTime: req.session.user.initialAnnual - annualLeave,
                         parseHour: parseHour,
+                        isAdmin: req.session.user.isAdmin.admin
                     });
                 })
                 .catch((err) => console.log(err));
@@ -113,70 +114,31 @@ module.exports.postRegAnnual = (req, res, next) => {
                     .populate("annuals.annualId")
                     .then((data) => {
                         if (data) {
-                            const hourIndex = data.annuals.findIndex((i) => {
-                                return i.annualId.timeAnnual < 8 && moment(i.annualId.startDateAnnual).format("YYYY-MM-DD") == fromDate.format("YYYY-MM-DD") && moment(i.annualId.endDateAnnual).format("YYYY-MM-DD") == toDate.format("YYYY-MM-DD") && i.annualId.isTimeAnnual === true;
-                            });
-                            console.log(data.annuals[hourIndex].annualId.timeAnnual + totalNumHour);
-                            console.log(data.annuals[hourIndex] + totalNumHour);
-                            if (hourIndex >= 0) {
-                                if (data.annuals[hourIndex].annualId.timeAnnual + totalNumHour > 8) {
-                                    req.flash("regAnnul", "Đã tồn tại lần đăng ký nghỉ theo giờ và tổng thời gian đăng ký nghỉ vượt quá 8h trong 1 ngày. Vui lòng kiểm tra lại!");
-                                    return res.redirect("/annual");
-                                }
-                                //Update
-                                if (_annualLeave - totalNumHour < 0) {
-                                    req.flash("regAnnul", "Thời gian đăng ký nghỉ lớn hơn thời gian nghỉ còn lại!");
-                                    return res.redirect("/annual");
-                                }
-                                data.annuals[hourIndex].annualId.timeAnnual = data.annuals[hourIndex].annualId.timeAnnual + totalNumHour;
-                                data.annuals[hourIndex].annualId.causeAnnual = `#1. ${data.annuals[hourIndex].annualId.causeAnnual} \n #2. ${cause}`;
-                                data.annuals[hourIndex].annualId.isTimeAnnual = data.annuals[hourIndex].annualId.timeAnnual + totalNumHour < 8 ? true : false;
-                                return data.annuals[hourIndex].annualId.save((err, doc) => {
-                                    if (err) {
-                                        console.log(err);
-                                    }
-                                    _User
-                                        .updateOne(
-                                            {
-                                                _id: req.session.user._id,
-                                            },
-                                            { annualLeave: _annualLeave - totalNumHour }
-                                        )
-                                        .then((data) => {
-                                            req.flash("regAnnul", "yes");
-                                            res.redirect("/annual");
-                                        })
-                                        .catch((err) => console.log(err));
-                                });
-                            }
-                            const indexDate = data.annuals.findIndex((i) => {
-                                return i.annualId.dayOff.indexOf(fromDate.format("YYYY-MM-DD"), toDate.format("YYYY-MM-DD")) >= 0;
-                            });
-                            if (indexDate >= 0) {
-                                req.flash("regAnnul", "Đã tồn tại ngày đăng ký nghỉ. Vui lòng kiểm tra lại!");
+                            if (data.isBlock === true) { //Thang da block
+                                req.flash("regAnnul", `Tháng ${fromDate.format("MM")} đã khóa. Không thể đăng ký!`);
                                 return res.redirect("/annual");
                             }
-                            const newAnnual = new _Annual({
-                                startDateAnnual: fromDate.format("YYYY-MM-DD"),
-                                endDateAnnual: toDate.format("YYYY-MM-DD"),
-                                timeAnnual: totalNumHour,
-                                causeAnnual: cause,
-                                dayOff: listDayOffs,
-                                isTimeAnnual: true,
-                                timeRecordingId: data._id,
-                            });
-                            newAnnual.save((err, doc) => {
-                                if (err) {
-                                    console.log(err);
-                                }
-                                _TimeRecording
-                                    .updateOne(
-                                        {
-                                            _id: doc.timeRecordingId,
-                                        },
-                                        { $push: { annuals: { annualId: doc._id } } }
-                                    )
-                                    .then((data) => {
+                            else {
+                                const hourIndex = data.annuals.findIndex((i) => {
+                                    return i.annualId.timeAnnual < 8 && moment(i.annualId.startDateAnnual).format("YYYY-MM-DD") == fromDate.format("YYYY-MM-DD") && moment(i.annualId.endDateAnnual).format("YYYY-MM-DD") == toDate.format("YYYY-MM-DD") && i.annualId.isTimeAnnual === true;
+                                });
+                                if (hourIndex >= 0) {
+                                    if (data.annuals[hourIndex].annualId.timeAnnual + totalNumHour > 8) {
+                                        req.flash("regAnnul", "Đã tồn tại lần đăng ký nghỉ theo giờ và tổng thời gian đăng ký nghỉ vượt quá 8h trong 1 ngày. Vui lòng kiểm tra lại!");
+                                        return res.redirect("/annual");
+                                    }
+                                    //Update
+                                    if (_annualLeave - totalNumHour < 0) {
+                                        req.flash("regAnnul", "Thời gian đăng ký nghỉ lớn hơn thời gian nghỉ còn lại!");
+                                        return res.redirect("/annual");
+                                    }
+                                    data.annuals[hourIndex].annualId.timeAnnual = data.annuals[hourIndex].annualId.timeAnnual + totalNumHour;
+                                    data.annuals[hourIndex].annualId.causeAnnual = `#1. ${data.annuals[hourIndex].annualId.causeAnnual} \n #2. ${cause}`;
+                                    data.annuals[hourIndex].annualId.isTimeAnnual = data.annuals[hourIndex].annualId.timeAnnual + totalNumHour < 8 ? true : false;
+                                    return data.annuals[hourIndex].annualId.save((err, doc) => {
+                                        if (err) {
+                                            console.log(err);
+                                        }
                                         _User
                                             .updateOne(
                                                 {
@@ -189,10 +151,52 @@ module.exports.postRegAnnual = (req, res, next) => {
                                                 res.redirect("/annual");
                                             })
                                             .catch((err) => console.log(err));
-                                    })
-                                    .catch((err) => console.log(err));
-                            });
-
+                                    });
+                                }
+                                const indexDate = data.annuals.findIndex((i) => {
+                                    return i.annualId.dayOff.indexOf(fromDate.format("YYYY-MM-DD"), toDate.format("YYYY-MM-DD")) >= 0;
+                                });
+                                if (indexDate >= 0) {
+                                    req.flash("regAnnul", "Đã tồn tại ngày đăng ký nghỉ. Vui lòng kiểm tra lại!");
+                                    return res.redirect("/annual");
+                                }
+                                const newAnnual = new _Annual({
+                                    startDateAnnual: fromDate.format("YYYY-MM-DD"),
+                                    endDateAnnual: toDate.format("YYYY-MM-DD"),
+                                    timeAnnual: totalNumHour,
+                                    causeAnnual: cause,
+                                    dayOff: listDayOffs,
+                                    isTimeAnnual: true,
+                                    timeRecordingId: data._id,
+                                });
+                                newAnnual.save((err, doc) => {
+                                    if (err) {
+                                        console.log(err);
+                                    }
+                                    _TimeRecording
+                                        .updateOne(
+                                            {
+                                                _id: doc.timeRecordingId,
+                                            },
+                                            { $push: { annuals: { annualId: doc._id } } }
+                                        )
+                                        .then((data) => {
+                                            _User
+                                                .updateOne(
+                                                    {
+                                                        _id: req.session.user._id,
+                                                    },
+                                                    { annualLeave: _annualLeave - totalNumHour }
+                                                )
+                                                .then((data) => {
+                                                    req.flash("regAnnul", "yes");
+                                                    res.redirect("/annual");
+                                                })
+                                                .catch((err) => console.log(err));
+                                        })
+                                        .catch((err) => console.log(err));
+                                });
+                            }
                             //Update
                         } else {
                             if (_annualLeave - totalNumHour < 0) {
@@ -267,56 +271,63 @@ module.exports.postRegAnnual = (req, res, next) => {
                     .populate("annuals.annualId")
                     .then((data) => {
                         if (data) {
-                            const hourIndex = data.annuals.findIndex((i) => {
-                                return i.annualId.dayOff.indexOf(fromDate.format("YYYY-MM-DD"), toDate.format("YYYY-MM-DD")) >= 0;
-                            });
-                            if (hourIndex >= 0) {
-                                // ngay dang ky khong hop le.
-                                //Return trung vs ngay da dang ky
-                                req.flash("regAnnul", "Đã tồn tại ngày đăng ký nghỉ. Vui lòng kiểm tra lại!");
+                            if (data.isBlock === true) { //Thang da block
+                                req.flash("regAnnul", `Tháng ${fromDate.format("MM")} đã khóa. Không thể đăng ký!`);
                                 return res.redirect("/annual");
-                            } else {
-                                if (_annualLeave - totalNumHour < 0) {
-                                    req.flash("regAnnul", "Thời gian đăng ký nghỉ lớn hơn thời gian nghỉ còn lại!");
-                                    return res.redirect("/annual");
-                                }
-                                const newAnnual = new _Annual({
-                                    startDateAnnual: fromDate.format("YYYY-MM-DD"),
-                                    endDateAnnual: toDate.format("YYYY-MM-DD"),
-                                    timeAnnual: totalNumHour,
-                                    causeAnnual: cause,
-                                    dayOff: listDayOffs,
-                                    isTimeAnnual: false,
-                                    timeRecordingId: data._id,
-                                });
-                                newAnnual.save((err, doc) => {
-                                    if (err) {
-                                        console.log(err);
-                                    }
-                                    _TimeRecording
-                                        .updateOne(
-                                            {
-                                                _id: doc.timeRecordingId,
-                                            },
-                                            { $push: { annuals: { annualId: doc._id } } }
-                                        )
-                                        .then((data) => {
-                                            _User
-                                                .updateOne(
-                                                    {
-                                                        _id: req.session.user._id,
-                                                    },
-                                                    { annualLeave: _annualLeave - totalNumHour }
-                                                )
-                                                .then((data) => {
-                                                    req.flash("regAnnul", "yes");
-                                                    res.redirect("/annual");
-                                                })
-                                                .catch((err) => console.log(err));
-                                        })
-                                        .catch((err) => console.log(err));
-                                });
                             }
+                            else {
+                                const hourIndex = data.annuals.findIndex((i) => {
+                                    return i.annualId.dayOff.indexOf(fromDate.format("YYYY-MM-DD"), toDate.format("YYYY-MM-DD")) >= 0;
+                                });
+                                if (hourIndex >= 0) {
+                                    // ngay dang ky khong hop le.
+                                    //Return trung vs ngay da dang ky
+                                    req.flash("regAnnul", "Đã tồn tại ngày đăng ký nghỉ. Vui lòng kiểm tra lại!");
+                                    return res.redirect("/annual");
+                                } else {
+                                    if (_annualLeave - totalNumHour < 0) {
+                                        req.flash("regAnnul", "Thời gian đăng ký nghỉ lớn hơn thời gian nghỉ còn lại!");
+                                        return res.redirect("/annual");
+                                    }
+                                    const newAnnual = new _Annual({
+                                        startDateAnnual: fromDate.format("YYYY-MM-DD"),
+                                        endDateAnnual: toDate.format("YYYY-MM-DD"),
+                                        timeAnnual: totalNumHour,
+                                        causeAnnual: cause,
+                                        dayOff: listDayOffs,
+                                        isTimeAnnual: false,
+                                        timeRecordingId: data._id,
+                                    });
+                                    newAnnual.save((err, doc) => {
+                                        if (err) {
+                                            console.log(err);
+                                        }
+                                        _TimeRecording
+                                            .updateOne(
+                                                {
+                                                    _id: doc.timeRecordingId,
+                                                },
+                                                { $push: { annuals: { annualId: doc._id } } }
+                                            )
+                                            .then((data) => {
+                                                _User
+                                                    .updateOne(
+                                                        {
+                                                            _id: req.session.user._id,
+                                                        },
+                                                        { annualLeave: _annualLeave - totalNumHour }
+                                                    )
+                                                    .then((data) => {
+                                                        req.flash("regAnnul", "yes");
+                                                        res.redirect("/annual");
+                                                    })
+                                                    .catch((err) => console.log(err));
+                                            })
+                                            .catch((err) => console.log(err));
+                                    });
+                                }
+                            }
+
                         } else {
                             //Ngay dang ky hop le
                             if (_annualLeave - totalNumHour < 0) {

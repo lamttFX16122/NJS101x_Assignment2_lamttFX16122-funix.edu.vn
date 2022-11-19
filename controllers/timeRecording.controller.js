@@ -1,5 +1,6 @@
 const moment = require("moment");
 const momentTZ = require("moment-timezone");
+const mongoose = require('mongoose');
 const _TimeRecording = require("../models/timeRecording.model");
 const _User = require("../models/user.model");
 const _TimeItem = require("../models/timeItem.model");
@@ -44,7 +45,6 @@ module.exports.getTimeRecording = (req, res, next) => {
                     userId: req.session.user._id,
                     year: parseInt(moment().format("YYYY")),
                     month: parseInt(moment().format("MM")),
-                    // dayTimes: { $elemMatch: { dayTime: { $eq: moment().format("YYYY-MM-DD") } } },
                 })
                 .populate("dayTimes")
                 .populate({
@@ -97,13 +97,15 @@ module.exports.getTimeRecording = (req, res, next) => {
                         img_user: req.session.user.image,
                         numActive: 1,
                         timeItems: monthInfo,
+                        userName: req.session.user.userName,
+                        userId: req.session.user._id,
                         moment: moment,
                         parseHour: parseHour,
+                        isAdmin: req.session.user.isAdmin.admin
                     });
                 })
                 .catch((err) => {
                     console.log(err);
-                    //throw new Error(err)
                 });
         })
         .catch((err) => console.log(err));
@@ -186,13 +188,163 @@ module.exports.postEndTime = (req, res, next) => {
         })
         .catch((err) => console.log(err));
 };
-module.exports.insertTimeRecording = (req, res, next) => {
-    const isInsert = insertMonth(req, 9, 2022);
-    if (isInsert) {
-        res.send("OKKKKKKKK");
-    }
-};
+// module.exports.insertTimeRecording = (req, res, next) => {
+//     const isInsert = insertMonth(req, 9, 2022);
+//     if (isInsert) {
+//         res.send("OKKKKKKKK");
+//     }
+// };
+module.exports.getConfirm = (req, res, next) => {
+    const memberId = req.query.member;
+    // let str_yearMonth = `${year}-${month.length === 1 ? +"0" + month : month}`;
+    let currentMonth = moment().format('YYYY-MM'); //Ngay ket thuc
 
+    if (memberId) {
+        let dataInfo = {};
+        _User.findById(memberId)
+            .then(userData => {
+                dataInfo.userData = userData; //Add userData vao object main
+                _TimeRecording.find({ userId: memberId })
+                    .populate("dayTimes")
+                    .populate({
+                        path: "dayTimes.times",
+                        populate: "timeItemId",
+                    })
+                    .populate({
+                        path: 'annuals.annualId'
+                    })
+                    .then(timeRecordingData => {
+                        let timeRecordings = [];
+                        timeRecordingData.forEach(monthItem => {
+                            let totalAnnual = 0;
+                            let objTemp = {
+                                _id: monthItem._id,
+                                year: monthItem.year,
+                                month: monthItem.month,
+                                // isWorking: monthItem.isWorking,
+                                isBlock: monthItem.isBlock,
+                                numMandatoryDay: monthItem.numMandatoryDay,
+                                userId: monthItem.userId,
+                                annuals: monthItem.annuals,
+                                dayTimes: monthItem.dayTimes
+                            };
+                            if (`${monthItem.year}-${monthItem.month}` === currentMonth) {
+                                objTemp.isWorking = true;
+                            }
+                            else {
+                                objTemp.isWorking = false;
+                            }
+                            monthItem.annuals.forEach(annual => {
+                                totalAnnual += annual.annualId.timeAnnual;
+                            })
+                            objTemp.totalWorkingTime_M = monthItem.totalWorkingTime_M + totalAnnual;
+                            objTemp.totalAnnual = totalAnnual;
+
+                            let totalWork = objTemp.totalWorkingTime_M;
+                            objTemp.lackTime_M = monthItem.numMandatoryDay * 8 * 60 - totalWork >= 0 ? monthItem.numMandatoryDay * 8 * 60 - totalWork : 0;
+                            objTemp.overTime_M = totalWork - monthItem.numMandatoryDay * 8 * 60 >= 0 ? totalWork - monthItem.numMandatoryDay * 8 * 60 : 0;
+                            let salary =
+                                userData.salaryScale * 3000000 +
+                                Math.round(((objTemp.overTime_M - objTemp.lackTime_M) / 60)) * 200000;
+                            objTemp.salary = changeMoney(salary);
+                            timeRecordings.push(objTemp);
+                        })
+                        dataInfo.timeRecordings = timeRecordings;
+
+                        let flashMes = req.flash('confirmMember'); //, `removed-${data._id}`
+
+                        let isShow = '';
+                        if (flashMes.length > 0) {
+                            const mesTemp = flashMes[0];
+                            const index = mesTemp.indexOf('-');
+                            flashMes = mesTemp.substring(0, index);
+                            isShow += mesTemp.substring(index + 1, mesTemp.length);
+                        }
+                        res.render("timeRecording/confirmMember.ejs", {
+                            title: "Xác nhận giờ làm nhân viên",
+                            img_user: req.session.user.image,
+                            isAdmin: req.session.user.isAdmin.admin,
+                            numActive: 5,
+                            data: dataInfo,
+                            isShow: isShow,
+                            flashMes: flashMes,
+                            moment: moment,
+                            parseHour: parseHour
+                        });
+                    })
+            })
+    } else {
+        _User.findById(req.session.user._id)
+            .populate({
+                path: 'isAdmin',
+                populate: {
+                    path: 'lstUser.memberId'
+                }
+            })
+            .then(data => {
+                // console.log(data)
+                res.render("timeRecording/confirm.ejs", {
+                    title: "Xác nhận giờ làm",
+                    img_user: req.session.user.image,
+                    numActive: 5,
+                    data: data,
+                    moment: moment,
+                    isAdmin: req.session.user.isAdmin.admin
+                });
+            })
+    }
+
+}
+
+module.exports.removeTimeItem = (req, res, next) => {
+    const dayTimeItem_id = req.body.id_daytime_remove;
+    const timeItem_id = req.body.id_time_remove;
+    const id_member = req.body.id_member;
+
+    _TimeItem.findOneAndRemove({ _id: timeItem_id })
+        .then(result => {
+            _TimeRecording.findById({ _id: result.timeRecordingId })
+                .populate('userId', 'numMandatoryDay')
+                .then(data => {
+                    const dayTimeindex = data.dayTimes.findIndex(i => {
+                        return i._id == dayTimeItem_id;
+                    })
+                    const timeItemIndex = data.dayTimes[dayTimeindex].times.findIndex(j => {
+                        return j.timeItemId == timeItem_id;
+                    })
+                    const dayTimeTemp = data.dayTimes[dayTimeindex];
+                    // Update time for day
+                    dayTimeTemp.totalWorkingTime -= result.numOfHour;
+                    dayTimeTemp.lackTime = 480 - dayTimeTemp.totalWorkingTime >= 0 ? 480 - dayTimeTemp.totalWorkingTime : 0;
+                    dayTimeTemp.overTime = dayTimeTemp.totalWorkingTime - 480 >= 0 ? dayTimeTemp.totalWorkingTime - 480 : 0;
+
+                    //Update time for month
+                    data.totalWorkingTime_M -= result.numOfHour;
+                    data.lackTime_M = data.userId.numMandatoryDay * 8 * 60 - data.totalWorkingTime_M >= 0 ? data.userId.numMandatoryDay * 8 * 60 - data.totalWorkingTime_M : 0;
+                    data.overTime_M = data.totalWorkingTime_M - data.userId.numMandatoryDay * 8 * 60 >= 0 ? data.totalWorkingTime_M - data.userId.numMandatoryDay * 8 * 60 : 0;
+
+                    dayTimeTemp.times.splice(timeItemIndex, 1);
+                    data.save((err, doc) => {
+                        if (err) {
+                            console.log(err);
+                        }
+                        req.flash('confirmMember', `removed-${data._id}`)
+                        res.redirect(`/confirm?member=${id_member}`)
+                    })
+                })
+        })
+}
+module.exports.confirmMonth = (req, res, next) => {
+    const monthId = req.body.id_month_confirm;
+    const memberId = req.body.member_id;
+
+    _TimeRecording.updateOne({ _id: monthId }, { isBlock: true })
+        .then(result => {
+            req.flash('confirmMember', `confirmed-`);
+            res.redirect(`/confirm?member=${memberId}`)
+        })
+        .catch(err => console.log(err));
+}
 const insertMonth = async (req, month, year) => {
     let str_yearMonth = `${year}-${month.length === 1 ? +"0" + month : month}`;
     const numOfMonthTemp = moment(str_yearMonth).daysInMonth(); // so ngay cua thang
@@ -315,4 +467,41 @@ function numWeekendOfMonth_List(monthYear) {
         firstDayOfMonth.add(1, "days");
     }
     return arr;
+}
+//Func trả về lương theo định dạng tiền VNĐ=> 7.000.000
+function changeMoney(money) {
+    let x = '';
+    if (typeof (money) == 'number') {
+        money = money.toString();
+        let mod = parseInt(money.length) % 3; // 1
+        let sub = parseInt(money.length) / 3; // 2
+
+        if (money.length > 3) {
+            if (mod > 0) {
+                x += money.substr(0, mod);
+                for (let i = 1; i <= sub; i++) {
+                    x += '.' + money.substr(mod, 3)
+                    mod += 3;
+                }
+                x += ' VNĐ'
+            } else {
+                for (let i = 1; i <= sub; i++) {
+                    if (i == 1) {
+                        x += money.substr(mod, mod + 3)
+                        mod += 3;
+                    } else {
+                        x += '.' + money.substr(mod, 3)
+                        mod += 2;
+                    }
+
+                }
+                x += ' VNĐ'
+            }
+        } else {
+            x += money + ' VNĐ';
+        }
+    } else {
+        x += money;
+    }
+    return x.trim();
 }

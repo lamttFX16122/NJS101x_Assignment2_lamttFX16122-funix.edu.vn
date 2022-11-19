@@ -1,0 +1,217 @@
+<%-include('../include/head.ejs')%> <%-include('../include/header.ejs')%> <%-include('../include/sidebar.ejs')%>
+<!-- ============================================================== -->
+<!-- Page wrapper  -->
+<!-- ============================================================== -->
+<div class="page-wrapper" style="min-height: 250px">
+  <!-- ============================================================== -->
+  <!-- Bread crumb and right sidebar toggle -->
+  <!-- ============================================================== -->
+  <div class="page-breadcrumb bg-white">
+    <div class="row">
+      <div class="col-12 text-center p-2">
+        <h4 class="page-title text-success"><i class="fas fa-calendar-alt"></i><span> <%=moment().format('DD/MM/YYYY')%></span></h4>
+      </div>
+      <hr />
+    </div>
+    <!-------------------- Message Acction ------------------------>
+    <div class="row">
+      <div class="col-12">
+        <!-- ===================== Mes Hypothermia=================== -->
+        <h4 class="page-title">Nhân viên</h4>
+        <p> <b><%=data.userData.userName%></b> - <%=data.userData._id%></p>
+        <!-- ===================== End Mes Covid===================== -->
+      </div>
+      
+      <!-------------------- End Message Action ------------------------>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <%if(flashMes && flashMes ==='removed'){%>
+        <h4 class="page-title text-info"><i class="far fas fa-child"></i><span> Xoá lần điểm danh thành công!</span></h4>
+        <%}%>
+        <%if(flashMes && flashMes ==='confirmed'){%>
+        <h4 class="page-title text-info"><i class="far fas fa-child"></i><span> Xác nhận thành công!</span></h4>
+        <%}%>
+      </div>
+    </div>
+  </div>
+  
+  
+  <!-- Container fluid  -->
+  <!-- ============================================================== -->
+  <div class="container-fluid">
+    <!-- ============================================================== -->
+    <!-- Start Page Content -->
+    <!-- ============================================================== -->
+    <div class="row">
+      <div class="col-md-12">
+        <div class="white-box">
+          <!-- -------------Tab Nav------------------ -->
+          <h4><b>Giờ làm chi tiết</b></h4>
+          <hr>
+          <% data.timeRecordings.forEach(monthItem=>{%>
+        <div class="row">
+          <h5 class="text-info"><b>Tháng <%=monthItem.month%>/<%=monthItem.year%></b></h5>
+        </div>
+        <div class="row">
+          <div class="col-lg-5 col-md-6 col-12">
+            <p>Tổng thời gian làm việc trong tháng: <%=parseHour(monthItem.totalWorkingTime_M,0)%></p>
+            <p>Tổng thời gian thiếu trong tháng: <%=parseHour(monthItem.lackTime_M,0)%></p>
+            <p>Tổng thời gian dư trong tháng: <%=parseHour(monthItem.overTime_M,0)%></p>
+          </div>
+          <div class="col-lg-4 col-md-6 col-12">
+            <p>Tổng thời gian nghỉ trong tháng: <%=parseHour(monthItem.totalAnnual, 1)%></p>
+            <p>Lương tháng: <%=monthItem.isWorking===true? 'Chưa kết tháng' : monthItem.salary%></p>
+            <p class="<%=monthItem.isBlock===true? 'text-info': 'text-danger'%>">Trạng thái: <%=monthItem.isBlock===true? 'Đã khóa': 'Chưa khóa'%></p>
+          </div>
+          <div class="col-lg-3 col-md-12 col-12">
+            <div class="row">
+              <div class="col-6">
+                <button class="btn btn-primary <%=isShow==monthItem._id ? 'collapsed': ''%>" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample-<%=monthItem._id%>" aria-expanded="<%=isShow==monthItem._id ? 'true': 'false'%>" aria-controls="collapseExample-<%=monthItem._id%>">
+                  Chi tiết
+                </button>
+              </div>
+              <div class="col-6">
+                <%if(monthItem.isBlock===false){%>
+                <form action="/confirm-member" method="POST">
+                  <input type="hidden" name="id_month_confirm" value="<%=monthItem._id%>">
+                  <input type="hidden" name="member_id" value="<%=data.userData._id%>">
+                  <button <%=monthItem.isWorking===true? 'disabled': ''%> class="btn btn-success">Xác nhận</button>
+                </form>
+                <%}%>
+              </div>
+            </div>
+          </div>
+        </div>
+        <hr>
+        <div class="row">
+          <div class="collapse <%=isShow==monthItem._id ? 'show': ''%>" id="collapseExample-<%=monthItem._id%>">
+                <div class="card card-body">
+                  <!-- Thoi gian nghi -->
+                  <%if(monthItem.annuals.length>0){%>
+                  <h3><b>Chi tiết đăng ký nghỉ trong tháng</b></h3>
+                  <div class="table-responsive">
+                    <table class="table text-nowrap tbl-time-detail">
+                      <thead>
+                        <tr>
+                          <th class="border-top-0">#</th>
+                          <th class="border-top-0">Bắt đầu</th>
+                          <th class="border-top-0">Kết thúc</th>
+                          <th class="border-top-0">Thời gian nghỉ</th>
+                          <th class="border-top-0">Lý do</th>
+                          <th class="border-top-0">Ngày đăng ký</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <%monthItem.annuals.forEach((annual,index)=>{%>
+                        <tr>
+                          <td><%=index+1%></td>
+                          <td><%=moment(annual.annualId.startDateAnnual).format('DD/MM/YYYY')%></td>
+                          <td><%=moment(annual.annualId.endDateAnnual).format('DD/MM/YYYY')%></td>
+                          <td><%=parseHour(annual.annualId.timeAnnual,1)%></td>
+                          <td><%=annual.annualId.causeAnnual%></td>
+                          <td><%=moment(annual.annualId.createdAt).format('HH:mm:ss-DD/MM/YYYY')%></td>
+                        </tr>
+                        <%})%>
+                      </tbody>
+                    </table>
+                  </div>
+                  <hr>
+                  <%}%>
+              <!--Thoi gian diem danh-->
+              <h3><b>Chi tiết điểm danh trong tháng</b></h3>
+              <div class="table-responsive">
+                <%monthItem.dayTimes.forEach(dayTimeItem=>{%>
+                  <table class="table text-nowrap tbl-time-detail-<%=dayTimeItem._id%>">
+                    <thead>
+                      <tr>
+                        <th class="border-top-0">#</th>
+                        <th class="border-top-0">Nơi làm việc</th>
+                        <th class="border-top-0">Bắt đầu</th>
+                        <th class="border-top-0">Kết thúc</th>
+                        <th class="border-top-0">Tổng</th>
+                        <th class="border-top-0"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      
+                      <tr class="border-top-1 border-primary">
+                        <td colspan="6">
+                          <h5><b>Ngày <%=moment(dayTimeItem.dayTime).format('DD/MM/YYYY')%></b></h5>
+                        </td>
+                      </tr>
+                      <%dayTimeItem.times.forEach((timeItem,index)=>{%>
+                      <tr>
+                        <td><%=index+1%></td>
+                        <td><%=timeItem.timeItemId.workPlace%></td>
+                        <td><%=moment(timeItem.timeItemId.startTime).format('HH:mm:ss')%></td>
+                        <td><%=timeItem.timeItemId.endTime?moment(timeItem.timeItemId.endTime).format('HH:mm:ss'):'Chưa kết thúc'%></td>
+                        <td><%=timeItem.timeItemId.endTime?parseHour(timeItem.timeItemId.numOfHour,0):'Chưa kết thúc'%></td>
+                        <td>
+                          <%if(monthItem.isBlock===false){%>
+                          <input type="hidden" id="timeItemId<%=timeItem.timeItemId._id%>" value="<%=timeItem.timeItemId._id%>">
+                          <input type="hidden" id="dayTimeId<%=timeItem.timeItemId._id%>" value="<%=dayTimeItem._id%>">
+                          <button id="<%=timeItem.timeItemId._id%>" class="btn btn-danger btn_time-remove">Xóa</button>
+                          <%}%>
+                    </td>
+                  </tr>
+                  <%})%>
+                          
+                          <thead class="border-top border-primary">
+                            <tr>
+                              <th colspan="6">
+                                <div class="d-flex flex-lg-row flex-md-row bd-highlight justify-content-evenly flex-column">
+                                  <p>Tổng thời gian làm: <%=parseHour(dayTimeItem.totalWorkingTime,0)%></p>
+                                  <p>Thời gian thiếu: <%=parseHour(dayTimeItem.lackTime,0)%></p>
+                                  <p>Thời gian dư: <%=parseHour(dayTimeItem.overTime,0)%></p>
+                                </div>
+                              </th>
+                            </tr>
+                          </thead>
+                          
+                          <%})%>
+                          
+                          
+                    </tbody>
+                  </table>
+                </div>
+                
+              </div>
+            </div>
+          </div>
+          <%})%>
+          
+          <!-- Modal -->
+          <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="staticBackdropLabel">Xóa lần điểm danh</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <p>Bạn chắc chắn muốn xóa lần điểm danh này?</p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                  <form action="/remove-time-item" method="POST">
+                    <input type="hidden" name="id_time_remove" id="id_time_remove" value="">
+                    <input type="hidden" name="id_daytime_remove" id="id_daytime_remove" value="">
+                    <input type="hidden" name="id_member" value="<%=data.userData._id%>">
+                    <button type="submit" class="btn btn-primary">Xóa</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- -------------End Tab Nav-------------- -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ============================================================== -->
+  <!-- End Container fluid  -->
+  <!-- ============================================================== -->
+  <%-include('../include/footer.ejs')%>
+  <%-include('../include/end.ejs')%>
+</div>

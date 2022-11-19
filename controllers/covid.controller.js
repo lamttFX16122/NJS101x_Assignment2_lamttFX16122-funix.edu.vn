@@ -19,34 +19,119 @@ module.exports.getCovid = (req, res, next) => {
             _activeTab = 2;
         }
     }
-    _Covid
-        .findOne({ userId: req.session.user._id })
-        .then((data) => {
-            if (data) {
-                data.hypothermia.sort((a, b) => {
-                    return moment(b.dateHypothermia) - moment(a.dateHypothermia);
+    if (req.session.user.isAdmin.admin) {
+        _User.findById(req.session.user._id)
+            .select('isAdmin.lstUser')
+            .then(userData => {
+                let lstUser = [];
+                userData.isAdmin.lstUser.forEach(userItem => {
+                    lstUser.push(userItem.memberId);
                 });
+                _User.find({ _id: { $in: lstUser } })
+                    .populate('covidId')
+                    .then(result => {
+                        console.log(result)
+                        _Covid
+                            .findOne({ userId: req.session.user._id })
+                            .then((data) => {
+                                if (!data) {
+                                    const newCovid = new _Covid({
+                                        hypothermia: [],
+                                        vaccine: [],
+                                        covid: [],
+                                        userId: req.session.user._id
+                                    })
+                                    newCovid.save((err, doc) => {
+                                        if (err) {
+                                            console.log(err)
+                                        }
+                                        _User.updateOne({ _id: req.session.user._id }, {
+                                            covidId: doc._id
+                                        }).then(result => {
+                                            res.redirect('/covid');
+                                        })
+                                    });
+                                } else {
+                                    data.hypothermia.sort((a, b) => {
+                                        return moment(b.dateHypothermia) - moment(a.dateHypothermia);
+                                    });
 
-                data.vaccine.sort((a, b) => {
-                    return moment(b.dateVaccine) - moment(a.dateVaccine);
+                                    data.vaccine.sort((a, b) => {
+                                        return moment(b.dateVaccine) - moment(a.dateVaccine);
+                                    });
+
+                                    data.covid.sort((a, b) => {
+                                        return moment(b.dateCovid) - moment(a.dateCovid);
+                                    });
+                                }
+
+                                res.render("covid/covid.ejs", {
+                                    title: "Covid",
+                                    img_user: req.session.user.image,
+                                    numActive: 4,
+                                    moment: moment,
+                                    flashMes: flashMes,
+                                    data: data,
+                                    userData: result,
+                                    _activeTab: _activeTab,
+                                    isAdmin: req.session.user.isAdmin.admin
+                                });
+                            })
+                            .catch((err) => console.log(err));
+                    })
+            })
+            .catch((err) => console.log(err));
+    }
+    else {
+        _Covid
+            .findOne({ userId: req.session.user._id })
+            .then((data) => {
+                if (!data) {
+                    const newCovid = new _Covid({
+                        hypothermia: [],
+                        vaccine: [],
+                        covid: [],
+                        userId: req.session.user._id
+                    })
+                    newCovid.save((err, doc) => {
+                        if (err) {
+                            console.log(err)
+                        }
+                        _User.updateOne({ _id: req.session.user._id }, {
+                            covidId: doc._id
+                        }).then(result => {
+                            res.redirect('/covid');
+                        })
+                    });
+                } else {
+                    data.hypothermia.sort((a, b) => {
+                        return moment(b.dateHypothermia) - moment(a.dateHypothermia);
+                    });
+
+                    data.vaccine.sort((a, b) => {
+                        return moment(b.dateVaccine) - moment(a.dateVaccine);
+                    });
+
+                    data.covid.sort((a, b) => {
+                        return moment(b.dateCovid) - moment(a.dateCovid);
+                    });
+                }
+
+                res.render("covid/covid.ejs", {
+                    title: "Covid",
+                    img_user: req.session.user.image,
+                    numActive: 4,
+                    moment: moment,
+                    flashMes: flashMes,
+                    data: data,
+                    userData: null,
+                    _activeTab: _activeTab,
+                    isAdmin: req.session.user.isAdmin.admin
                 });
+            })
+            .catch((err) => console.log(err));
+    }
 
-                data.covid.sort((a, b) => {
-                    return moment(b.dateCovid) - moment(a.dateCovid);
-                });
-            }
-
-            res.render("covid/covid.ejs", {
-                title: "Covid",
-                img_user: req.session.user.image,
-                numActive: 4,
-                moment: moment,
-                flashMes: flashMes,
-                data: data,
-                _activeTab: _activeTab,
-            });
-        })
-        .catch((err) => console.log(err));
 };
 
 // ================= Hypothermia=================

@@ -1,0 +1,148 @@
+<%-include('../include/head.ejs')%>
+<%-include('../include/header.ejs')%>
+<%-include('../include/sidebar.ejs')%>
+<!-- ============================================================== -->
+<!-- Page wrapper  -->
+<!-- ============================================================== -->
+<div class="page-wrapper" style="min-height: 250px;">
+  <div class="page-breadcrumb bg-white">
+    <div class="row">
+      <div class="col-12 text-center p-2">
+        <h4 class="page-title text-success"><i class="fas fa-calendar-alt"></i><span> <%=moment().format('DD/MM/YYYY')%></span></h4>
+      </div>
+      <hr />
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <%if(flashMes && flashMes ==='updated'){%>
+        <h4 class="page-title text-info"><i class="far fas fa-child"></i><span> Thay đổi hình ảnh thành công!</span></h4>
+        <%}%>
+      </div>
+    </div>
+  </div>
+  <div class="container-fluid">
+    <!-- ============================================================== -->
+    <!-- Start Page Content -->
+    <!-- ============================================================== -->
+    <div class="row">
+      <!-- Column -->
+      <div class="col-lg-4 col-xlg-3 col-md-12">
+        <div class="white-box">
+          <div class="user-bg"> <img alt="user" src="plugins/images/large/img1.jpg" width="100%">
+            <div class="overlay-box">
+              <div class="user-content">
+                <a href="javascript:void(0)"><img src="<%=img_user%>" class="thumb-lg img-circle" alt="img"></a>
+        <h4 class="text-white mt-2"><%=data.userName%></h4>
+        <h5 class="text-white mt-2"><%=data.email%></h5>
+      </div>
+    </div>
+  </div>
+  <div class="user-btm-box mt-5 d-md-flex">
+    <div class="col-12 text-center">
+      <h4><%=data._id%></h4>
+    </div>
+  </div>
+</div>
+</div>
+<!-- Column -->
+<!-- Column -->
+<div class="col-lg-8 col-xlg-9 col-md-12">
+  <div class="card">
+    <div class="card-body">
+      <form class="form-horizontal form-material">
+        
+        <div class="form-group mb-4">
+          <label class="col-md-12 p-0">Ngày sinh</label>
+          <div class="col-md-12 border-bottom p-0">
+            <input type="text" disabled value="<%=moment(data.doB).format('DD/MM/YYYY')%>" class="form-control p-0 border-0">
+          </div>
+        </div>
+        
+        <div class="form-group mb-4">
+          <label for="example-email" class="col-md-12 p-0">Hệ số lương</label>
+          <div class="col-md-12 border-bottom p-0">
+            <input type="text" disabled value="<%=data.salaryScale%>" class="form-control p-0 border-0" name="example-email" id="example-email">
+          </div>
+        </div>
+        
+        <div class="form-group mb-4">
+          <label class="col-md-12 p-0">Ngày vào làm</label>
+          <div class="col-md-12 border-bottom p-0">
+            <input type="text" disabled value="<%=moment(data.startDate).format('DD/MM/YYYY')%>" class="form-control p-0 border-0">
+          </div>
+        </div>
+        
+        <div class="form-group mb-4">
+          <label class="col-md-12 p-0">Phòng ban</label>
+          <div class="col-md-12 border-bottom p-0">
+            <input type="text" disabled value="<%=data.department%>" class="form-control p-0 border-0">
+          </div>
+        </div>
+        
+        <div class="form-group mb-4">
+          <label class="col-md-12 p-0">Số ngày nghỉ</label>
+          <div class="col-md-12 border-bottom p-0">
+            <input type="text" disabled value="<%=parseHour(data.initialAnnual,1)%>" class="form-control p-0 border-0">
+          </div>
+        </div>
+        
+        <div class="form-group mb-4">
+          <label class="col-md-12 p-0">Số ngày nghỉ còn lại</label>
+          <div class="col-md-12 border-bottom p-0">
+            <input type="text" disabled value="<%=parseHour(data.annualLeave,1)%>" class="form-control p-0 border-0">
+          </div>
+        </div>
+        
+        <div class="form-group mb-4">
+          <label class="col-md-12 p-0">Hình ảnh</label>
+          <div class="col-md-12 border-bottom p-0">
+            <img class="rounded-circle me-lg-2" src="<%=data.image%>" alt="" style="width: 80px; height: 80px;">
+            <!-- <input type="file" value="" class="form-control p-0 border-0"> -->
+          </div>
+        </div>
+        
+        <div class="form-group mb-4">
+          <div class="col-sm-12">
+            <!-- <button class="btn btn-success">Update Profile</button> -->
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Thay đổi ảnh</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Update Image -->
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-info" id="staticBackdropLabel">Thay đổi hình ảnh</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="frm_changeImg" action="/change-img" method="POST" enctype="multipart/form-data">
+        <div class="modal-body">
+          
+          <div class="mb-3">
+            <label for="imageUrl" class="form-label">Hình ảnh</label>
+            <input type="file" class="form-control bg-white" id="imageUrl" name="image">
+          </div>
+          <span class="text-danger err-changeImg" hidden>Chưa chọn hình ảnh</span>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="submit" class="btn btn-primary">Sửa</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- Column -->
+</div>
+</div>
+<!-- ============================================================== -->
+<!-- End Container fluid  -->
+<!-- ============================================================== -->
+<%-include('../include/footer.ejs')%>
+<%-include('../include/end.ejs')%>

@@ -11,6 +11,7 @@ module.exports.getAddUser = (req, res, next) => {
         title: "Điểm danh",
         img_user: "imagesimage-1667714506718.PNG",
         numActive: 3,
+        isAdmin: req.session.user.isAdmin.admin
     });
 };
 module.exports.postAddUser = (req, res, next) => {
@@ -52,6 +53,7 @@ module.exports.getAddMember = (req, res, next) => {
         title: "Thêm nhân viên",
         img_user: req.session.user.image,
         numActive: 3,
+        isAdmin: req.session.user.isAdmin.admin
     });
 };
 module.exports.postAddMember = (req, res, next) => {
@@ -129,7 +131,7 @@ module.exports.getLookup = async (req, res, next) => {
                 data.forEach(item => {
                     lst_idTimeRecording.push(item._id);
                 });
-                _TimeItem.countDocuments()
+                _TimeItem.countDocuments({ timeRecordingId: { $in: lst_idTimeRecording } })
                     .then(numItem => {
                         let promiseTimeItem; // Promise cho option sort
                         if (sortDay === -1 || sortDay === 1 || sortWorkPlace) {
@@ -258,7 +260,7 @@ module.exports.getLookup = async (req, res, next) => {
                             res.render("user/lookup", {
                                 title: "Tra cứu thông tin",
                                 img_user: req.session.user.image,
-                                numActive: 3,
+                                numActive: 4,
                                 _activeTab: 0,
                                 data: dataPrimary,
                                 moment: moment,
@@ -267,13 +269,58 @@ module.exports.getLookup = async (req, res, next) => {
                                 lastPage: Math.ceil(numItem / pagesize),
                                 pagesize: pagesize,
                                 sortDay: sortDay,
-                                sortWorkPlace: sortWorkPlace
+                                sortWorkPlace: sortWorkPlace,
+                                isAdmin: req.session.user.isAdmin.admin
                             });
                         });
                     })
             });
         });
 };
+
+module.exports.getInfo = (req, res, next) => {
+    _User.findById(req.session.user._id)
+        .then(data => {
+            let flashMes = req.flash('updateImage');
+            if (flashMes.length > 0) {
+                flashMes = flashMes[0];
+            }
+            res.render("user/info", {
+                title: "Thông tin cá nhân",
+                img_user: req.session.user.image,
+                numActive: 4,
+                data: data,
+                moment: moment,
+                parseHour: parseHour,
+                flashMes: flashMes,
+                isAdmin: req.session.user.isAdmin.admin
+            });
+        })
+
+}
+
+module.exports.changeImage = (req, res, next) => {
+    const image = req.file;
+    _User
+        .updateOne(
+            { _id: req.session.user._id },
+            {
+                image: image.path
+            }
+        )
+        .then(result => {
+            req.session.user.image = image.path;
+            req.session.save((err, doc) => {
+                if (err) {
+                    console.log(err)
+                }
+                req.flash('updateImage', 'updated');
+                res.redirect("/info");
+            })
+
+        })
+        .catch(err => console.log(err));
+}
 //Func doi phut thành giờ || giờ thành ngày
 function parseHour(hour, type) {
     let result = "";

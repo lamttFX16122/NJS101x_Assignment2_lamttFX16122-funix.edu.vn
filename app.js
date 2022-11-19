@@ -16,7 +16,7 @@ const routeUser = require('./routers/user.route');
 const routeAnnual = require('./routers/annual.route');
 const routeTimeRecording = require('./routers/timeRecording.route');
 const _User = require('./models/user.model');
-const routeCovid=require('./routers/covid.route');
+const routeCovid = require('./routers/covid.route');
 /* == End Import==*/
 
 /* == Param==*/
@@ -29,22 +29,22 @@ const store = new mongoDbSession({
     collection: 'sessions'
 });
 const fileStore = multer.diskStorage({
-    destination: function(req, file, cb) {
+    destination: function (req, file, cb) {
         cb(null, 'images')
     },
-    filename: function(req, file, cb) {
+    filename: function (req, file, cb) {
         cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
     }
 });
 
 const fileFill = (req, file, cb) => {
-        if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg' || file.mimetype === 'image/jpg') {
-            cb(null, true)
-        } else {
-            cb(null, false)
-        }
+    if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg' || file.mimetype === 'image/jpg') {
+        cb(null, true)
+    } else {
+        cb(null, false)
     }
-    /* == End Param==*/
+}
+/* == End Param==*/
 
 /* == App Set==*/
 app.set('view engine', 'ejs');
@@ -74,21 +74,21 @@ app.use(routeTimeRecording);
 
 
 app.use((req, res, next) => {
-        if (!req.session.user) {
-            return next();
-        }
-        _User.findById(req.session.user._id)
-            .then(user => {
-                if (!user) {
-                    return next();
-                }
-                req.user = user;
-                next();
-            }).catch(err => {
-                throw new Error(err);
-            });
-    })
-    /* == End App Use==*/
+    if (!req.session.user) {
+        return next();
+    }
+    _User.findById(req.session.user._id)
+        .then(user => {
+            if (!user) {
+                return next();
+            }
+            req.user = user;
+            next();
+        }).catch(err => {
+            throw new Error(err);
+        });
+})
+/* == End App Use==*/
 
 /* == DB Connect==*/
 Mongoose.connect(_DB_URL)

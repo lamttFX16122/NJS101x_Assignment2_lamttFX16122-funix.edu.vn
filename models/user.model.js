@@ -50,7 +50,7 @@ const userSchema = new Schema({
         lstUser: [{
             memberId: {
                 type: Schema.Types.ObjectId,
-                ref: 'USer'
+                ref: 'User'
             }
         }]
     },
