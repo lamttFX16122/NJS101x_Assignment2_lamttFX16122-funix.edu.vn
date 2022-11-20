@@ -51,12 +51,18 @@ exports.postLogin = (req, res, next) => {
                             res.redirect('/');
                         })
                     } else {
+                        let flashMes = req.flash('requireLogin');
+                        if (flashMes.length > 0) {
+                            flashMes = flashMes[0];
+                        }
                         return res.status(422).render('auth/login', {
                             oldDoc: {
                                 email: req.body.email,
                                 password: req.body.password
                             },
-                            errMes: 'Email hoặc mật khẩu không hợp lệ!'
+                            errMes: 'Email hoặc mật khẩu không hợp lệ!',
+                            flashMes: flashMes
+
                         });
                     }
                 })
