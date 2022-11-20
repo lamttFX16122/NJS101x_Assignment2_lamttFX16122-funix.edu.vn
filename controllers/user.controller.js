@@ -4,6 +4,7 @@ const { validationResult } = require("express-validator");
 const _User = require("../models/user.model");
 const _TimeRecording = require("../models/timeRecording.model");
 const _TimeItem = require("../models/timeItem.model");
+const _Covid = require('../models/covid.model');
 
 // ADD USER
 module.exports.getAddUser = (req, res, next) => {
@@ -65,6 +66,11 @@ module.exports.postAddMember = (req, res, next) => {
     bcryptjs
         .hash(req.body.password, 12)
         .then(hashPw => {
+            const newCovid = new _Covid({
+                hypothermia: [],
+                vaccine: [],
+                covid: []
+            })
             const user = new _User({
                 email: req.body.email,
                 password: hashPw,
@@ -77,7 +83,9 @@ module.exports.postAddMember = (req, res, next) => {
                 annualLeave: req.body.annualLeave * 8,
                 image: image.path,
                 ownerId: req.session.user._id,
+                covidId: newCovid._id
             });
+            newCovid.userId = user._id;
             user.save((err, doc) => {
                 if (err) {
                     console.log(err);
@@ -90,7 +98,7 @@ module.exports.postAddMember = (req, res, next) => {
                         }
                     )
                     .then(result => {
-                        return result;
+                        return newCovid.save();
                     });
             });
         })
@@ -250,9 +258,12 @@ module.exports.getLookup = async (req, res, next) => {
                                 }
                                 // ===================== ==========Tinh Luong =========== =====================
                                 // Lương = salaryScale * 3000000 + (overTime - số giờ làm thiếu) * 200000)
+                                // let b = ;
+                                // let a = dataUser.salaryScale * 3000000 + Math.round(b, 2);
+                                // console.log('===Salary test: ', changeMoney(a))
                                 let salary =
                                     dataUser.salaryScale * 3000000 +
-                                    Math.round(((tempObj.totalAnnual_M + tempObj.overTime_M - tempObj.lackTime_M) / 60)) * 200000;
+                                    Math.round((tempObj.totalAnnual_M + ((tempObj.overTime_M - tempObj.lackTime_M) / 60)) * 200000, 2);
                                 tempObj.salaryMonth = changeMoney(salary);
                                 dataInfo.push(tempObj);
                             });

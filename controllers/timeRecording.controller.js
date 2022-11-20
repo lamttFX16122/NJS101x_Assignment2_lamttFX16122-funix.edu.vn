@@ -196,7 +196,6 @@ module.exports.postEndTime = (req, res, next) => {
 // };
 module.exports.getConfirm = (req, res, next) => {
     const memberId = req.query.member;
-    // let str_yearMonth = `${year}-${month.length === 1 ? +"0" + month : month}`;
     let currentMonth = moment().format('YYYY-MM'); //Ngay ket thuc
 
     if (memberId) {
@@ -221,7 +220,6 @@ module.exports.getConfirm = (req, res, next) => {
                                 _id: monthItem._id,
                                 year: monthItem.year,
                                 month: monthItem.month,
-                                // isWorking: monthItem.isWorking,
                                 isBlock: monthItem.isBlock,
                                 numMandatoryDay: monthItem.numMandatoryDay,
                                 userId: monthItem.userId,
@@ -237,7 +235,7 @@ module.exports.getConfirm = (req, res, next) => {
                             monthItem.annuals.forEach(annual => {
                                 totalAnnual += annual.annualId.timeAnnual;
                             })
-                            objTemp.totalWorkingTime_M = monthItem.totalWorkingTime_M + totalAnnual;
+                            objTemp.totalWorkingTime_M = monthItem.totalWorkingTime_M + (totalAnnual * 60);
                             objTemp.totalAnnual = totalAnnual;
 
                             let totalWork = objTemp.totalWorkingTime_M;
@@ -245,7 +243,7 @@ module.exports.getConfirm = (req, res, next) => {
                             objTemp.overTime_M = totalWork - monthItem.numMandatoryDay * 8 * 60 >= 0 ? totalWork - monthItem.numMandatoryDay * 8 * 60 : 0;
                             let salary =
                                 userData.salaryScale * 3000000 +
-                                Math.round(((objTemp.overTime_M - objTemp.lackTime_M) / 60)) * 200000;
+                                Math.round(((objTemp.overTime_M - objTemp.lackTime_M) / 60) * 200000, 2);
                             objTemp.salary = changeMoney(salary);
                             timeRecordings.push(objTemp);
                         })
@@ -282,7 +280,6 @@ module.exports.getConfirm = (req, res, next) => {
                 }
             })
             .then(data => {
-                // console.log(data)
                 res.render("timeRecording/confirm.ejs", {
                     title: "Xác nhận giờ làm",
                     img_user: req.session.user.image,
@@ -360,8 +357,6 @@ const insertMonth = async (req, month, year) => {
         userId: req.session.user._id,
     });
 
-    // await monthTimeRecording.save();
-    // await _User.updateOne({ _id: req.session.user._id, $push: { timeRecordings: { timeRecordingId: monthTimeRecording._id } } });
     // ============== Insert TimeItem====================
     let firstDayOfMonth = moment(str_yearMonth).startOf("month"); //Ngay bat dau
     let end = moment(str_yearMonth).endOf("month"); //Ngay ket thuc
