@@ -93,8 +93,11 @@ app.use((req, res, next) => {
 /* == DB Connect==*/
 Mongoose.connect(_DB_URL)
     .then(connect => {
-        console.log('Connected...');
-        app.listen(3002);
+
+        // app.listen(3002);
+        app.listen(process.env.PORT || 3002, '0.0.0.0', () => {
+            console.log('Connected...');
+        })
     })
     .catch(err => console.log(err));
 /* == End DB Connect==*/
