@@ -188,12 +188,13 @@ module.exports.postEndTime = (req, res, next) => {
         })
         .catch((err) => console.log(err));
 };
-// module.exports.insertTimeRecording = (req, res, next) => {
-//     const isInsert = insertMonth(req, 9, 2022);
-//     if (isInsert) {
-//         res.send("OKKKKKKKK");
-//     }
-// };
+// insert TimeRecording for user 
+module.exports.insertTimeRecording = (req, res, next) => {
+    const isInsert = insertMonth(req, 10, 2022);
+    if (isInsert) {
+        res.send("OKKKKKKKK");
+    }
+};
 module.exports.getConfirm = (req, res, next) => {
     const memberId = req.query.member;
     let currentMonth = moment().format('YYYY-MM'); //Ngay ket thuc
@@ -343,7 +344,7 @@ module.exports.confirmMonth = (req, res, next) => {
         .catch(err => console.log(err));
 }
 const insertMonth = async (req, month, year) => {
-    let str_yearMonth = `${year}-${month.length === 1 ? +"0" + month : month}`;
+    let str_yearMonth = `${year}-${month.length === 1 ? "0" + month : month}`;
     const numOfMonthTemp = moment(str_yearMonth).daysInMonth(); // so ngay cua thang
     const weekendOfMonth = numWeekendOfMonth(str_yearMonth); // so ngay thu 7 va chu nhat
 

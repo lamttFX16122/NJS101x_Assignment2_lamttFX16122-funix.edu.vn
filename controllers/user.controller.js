@@ -112,7 +112,7 @@ module.exports.getLookup = async (req, res, next) => {
     // Set Limit page
     let dataPrimary = {};
     let page = +req.query.page || 1;
-    let pagesize = +req.query.pagesize || 5;
+    let pagesize = +req.query.pagesize || 20;
     let sortDay = +req.query.sortDay;
     let sortWorkPlace = req.query.sortWorkPlace === 'true' ? true : false || false;
     _User
