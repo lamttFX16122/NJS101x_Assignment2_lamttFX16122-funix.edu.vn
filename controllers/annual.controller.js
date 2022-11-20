@@ -5,9 +5,6 @@ const _TimeRecording = require("../models/timeRecording.model");
 const _TimeItem = require("../models/timeItem.model");
 
 module.exports.getTest = (req, res, next) => {
-    // const firstDayOfMonth = moment("2022-10").startOf("month");
-    // let a = moment(firstDayOfMonth.format("YYYY-MM-DD") + " " + "07:00");
-    // console.log(a);
     _TimeItem.deleteMany({ timeRecordingId: "636ea6ca373ee4a4966a0956" }).then((data) => {
         console.log(data);
     });
@@ -485,7 +482,6 @@ function numWeekendOfMonth(monthYear) {
     while (firstDayOfMonth <= end) {
         if (firstDayOfMonth.format("dddd") === "Sunday" || firstDayOfMonth.format("dddd") === "Saturday") {
             arr.push(firstDayOfMonth.format("YYYY-MM-DD"));
-            //temp++;
         }
         firstDayOfMonth.add(1, "days");
     }

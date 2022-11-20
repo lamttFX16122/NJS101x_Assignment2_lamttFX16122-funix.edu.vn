@@ -1,13 +1,12 @@
 const moment = require("moment");
-const flash = require("connect-flash");
 const path = require("path");
 const fs = require("fs");
 const PDFDocument = require("pdfkit");
 const _User = require("../models/user.model");
 const _Covid = require("../models/covid.model");
-const doc = require("pdfkit");
 
-module.exports.getCovid = (req, res, next) => {
+
+module.exports.getCovid = async (req, res, next) => {
     let _activeTab = 0;
     let flashMes = req.flash("Covid");
     if (flashMes.length > 0) {
@@ -30,7 +29,6 @@ module.exports.getCovid = (req, res, next) => {
                 _User.find({ _id: { $in: lstUser } })
                     .populate('covidId')
                     .then(result => {
-                        console.log(result)
                         _Covid
                             .findOne({ userId: req.session.user._id })
                             .then((data) => {
@@ -64,7 +62,6 @@ module.exports.getCovid = (req, res, next) => {
                                         return moment(b.dateCovid) - moment(a.dateCovid);
                                     });
                                 }
-
                                 res.render("covid/covid.ejs", {
                                     title: "Covid",
                                     img_user: req.session.user.image,
@@ -413,18 +410,21 @@ module.exports.postRemoveCovid = (req, res, next) => {
 // ================= End Covid ==================
 
 module.exports.exportCovidPDF = (req, res, next) => {
+    const userId = req.query.userId;
+    // console.log(userId)
     _Covid
-        .findOne({ userId: req.session.user._id })
+        .findOne({ userId: userId })
+        .populate('userId')
         .then((data) => {
             if (!data) {
                 // Chua co thong tin covid
             }
-            const fileName = `covid_info_${req.session.user._id}_${moment().format("DDMMYYYYHHmmss")}.pdf`;
+            const fileName = `covid_info_${userId}_${moment().format("DDMMYYYYHHmmss")}.pdf`;
             const filePath = path.join("documentPDF", fileName);
 
             const docPdf = new PDFDocument({ size: "A4", margin: 50 });
             generateHeader(docPdf);
-            generateUserInfo(docPdf, req.session.user);
+            generateUserInfo(docPdf, data.userId);
             generateHypothermiaTable(docPdf, data);
             docPdf.end();
             docPdf.pipe(fs.createWriteStream(filePath));
@@ -436,7 +436,41 @@ module.exports.exportCovidPDF = (req, res, next) => {
         })
         .catch((err) => console.log(err));
 };
+module.exports.printListPDF = (req, res, next) => {
+    const userId = req.body.checkUserId;
+    let arrUserId = [];
+    if (typeof (userId) == 'string') {
+        arrUserId = [userId];
+    }
+    else {
+        arrUserId = userId
+    }
+    _User.find({ _id: { $in: arrUserId } })
+        .populate('covidId')
+        .then(data => {
+            const fileName = `List_covid_info_${moment().format("DDMMYYYYHHmmss")}.pdf`;
+            const filePath = path.join("documentPDF", fileName);
 
+            const docPdf = new PDFDocument({ size: "A4", margin: 50 });
+            data.forEach((userItem, index) => {
+                generateHeader(docPdf);
+                generateUserInfo(docPdf, userItem);
+                generateHypothermiaTable(docPdf, userItem.covidId);
+
+                if (index + 1 < data.length) {
+                    docPdf.addPage();
+                }
+            })
+
+            docPdf.end();
+            docPdf.pipe(fs.createWriteStream(filePath));
+            res.type("application/pdf");
+            //Dowload pdf
+            // res.setHeader("Content-Disposition", 'attachment; filename="' + fileName + '"');
+            // res.setHeader("Content-Disposition", 'inline; filename="' + fileName + '"');
+            docPdf.pipe(res);
+        })
+}
 // ================== Func custom PDF ====================
 const generateHeader = (doc) => {
     doc.font("public/font/timesbd.ttf").fontSize(20).text("THÔNG TIN KHAI BÁO COVID", { align: "center" }).moveDown();
@@ -479,26 +513,32 @@ const generateHypothermiaTable = (doc, data) => {
     doc.fillColor("#444444").font("public/font/timesbd.ttf").fontSize("15").text("Thông tin thân nhiệt", 50, marginTop);
     generateHr(doc, marginTop + 20, 550);
     doc.font("public/font/timesbd.ttf");
-    // Table title
-    generateTableRow_Hypo(doc, marginTop + 35, 13, "#", "Nhiệt độ", "Thời gian", "Tình trạng");
+    if (data.hypothermia.length > 0) {
+        // Table title
+        generateTableRow_Hypo(doc, marginTop + 35, 13, "#", "Nhiệt độ", "Thời gian", "Tình trạng");
 
-    generateHr(doc, marginTop + 60, 500);
-    // table content
-    doc.font("public/font/times.ttf");
-    let _countHypo = 0;
-    data.hypothermia.forEach((item, index) => {
-        let position = marginTop + 60 + (_countHypo + 1) * 15;
-        generateTableRow_Hypo(doc, position, 10, index + 1, item.temperature, `${item.timeHypothermia}-${moment(item.dateHypothermia).format("DD/MM/YYYY")}`, item.affection);
-        generateHr(doc, position + 20, 500);
-        marginTop += 20;
-        marginTopNext = position + 20;
-        _countHypo++;
-        if (position > 650) {
-            _countHypo = 0;
-            marginTop = 20;
-            doc.addPage();
-        }
-    });
+        generateHr(doc, marginTop + 60, 500);
+        // table content
+        doc.font("public/font/times.ttf");
+        let _countHypo = 0;
+        data.hypothermia.forEach((item, index) => {
+            let position = marginTop + 60 + (_countHypo + 1) * 15;
+            generateTableRow_Hypo(doc, position, 10, index + 1, item.temperature, `${item.timeHypothermia}-${moment(item.dateHypothermia).format("DD/MM/YYYY")}`, item.affection);
+            generateHr(doc, position + 20, 500);
+            marginTop += 20;
+            marginTopNext = position + 20;
+            _countHypo++;
+            if (position > 650) {
+                _countHypo = 0;
+                marginTop = 20;
+                doc.addPage();
+            }
+        });
+    } else {
+        doc.fillColor("#444444").font("public/font/timesbd.ttf").fontSize("12").text("Chưa có thông tin thân nhiệt!", 50, marginTop + 30);
+        marginTopNext = marginTop + 60;
+    }
+
     // =========== End Thông tin thân nhiệt====================
 
     // =========== Thông tin Vaccine =========================
@@ -507,26 +547,32 @@ const generateHypothermiaTable = (doc, data) => {
     doc.fillColor("#444444").font("public/font/timesbd.ttf").fontSize("15").text("Thông tin Vaccine", 50, marginVaccine);
     generateHr(doc, marginVaccine + 20, 550);
     doc.font("public/font/timesbd.ttf");
-    // Table title
-    generateTableRow_Vac(doc, marginVaccine + 35, 13, "#", "Mũi tiêm", "Thời gian", "Loại Vaccine");
+    if (data.vaccine.length > 0) {
+        // Table title
+        generateTableRow_Vac(doc, marginVaccine + 35, 13, "#", "Mũi tiêm", "Thời gian", "Loại Vaccine");
 
-    generateHr(doc, marginVaccine + 60, 500);
-    // table content
-    let _countVac = 0;
-    doc.font("public/font/times.ttf");
-    data.vaccine.forEach((item, index) => {
-        const position = marginVaccine + 60 + (_countVac + 1) * 15;
-        generateTableRow_Vac(doc, position, 10, index + 1, item.numVaccine, moment(item.dateVaccine).format("DD/MM/YYYY"), item.typeVaccine);
-        generateHr(doc, position + 20, 500);
-        marginVaccine += 20;
-        marginTopNext = position + 20;
-        _countVac++;
-        if (position > 650) {
-            _countVac = 0;
-            marginVaccine = 20;
-            doc.addPage();
-        }
-    });
+        generateHr(doc, marginVaccine + 60, 500);
+        // table content
+        let _countVac = 0;
+        doc.font("public/font/times.ttf");
+        data.vaccine.forEach((item, index) => {
+            const position = marginVaccine + 60 + (_countVac + 1) * 15;
+            generateTableRow_Vac(doc, position, 10, index + 1, item.numVaccine, moment(item.dateVaccine).format("DD/MM/YYYY"), item.typeVaccine);
+            generateHr(doc, position + 20, 500);
+            marginVaccine += 20;
+            marginTopNext = position + 20;
+            _countVac++;
+            if (position > 650) {
+                _countVac = 0;
+                marginVaccine = 20;
+                doc.addPage();
+            }
+        });
+    } else {
+        doc.fillColor("#444444").font("public/font/timesbd.ttf").fontSize("12").text("Chưa có thông tin tiêm Vaccine!", 50, marginVaccine + 30);
+        marginTopNext = marginVaccine + 60;
+    }
+
     // =========== End Thông tin Vaccinet =====================
 
     // =========== Is Covid ===================================
@@ -535,25 +581,31 @@ const generateHypothermiaTable = (doc, data) => {
     doc.fillColor("#444444").font("public/font/timesbd.ttf").fontSize("15").text("Thông tin dương tính Covid", 50, marginTopNextCovid);
     generateHr(doc, marginTopNextCovid + 20, 550);
     doc.font("public/font/timesbd.ttf");
-    // Table title
-    generateTableRow_Covid(doc, marginTopNextCovid + 35, 13, "#", "Lần nhiễm", "Thời gian", "Tình trạng", "Triệu chứng");
+    if (data.covid.length > 0) {
+        // Table title
+        generateTableRow_Covid(doc, marginTopNextCovid + 35, 13, "#", "Lần nhiễm", "Thời gian", "Tình trạng", "Triệu chứng");
 
-    generateHr(doc, marginTopNextCovid + 60, 500);
-    // table content
-    doc.font("public/font/times.ttf");
-    let _countCovid = 0; //set for newPage
-    data.covid.forEach((item, index) => {
-        const position = marginTopNextCovid + 60 + (_countCovid + 1) * 15;
-        generateTableRow_Covid(doc, position, 10, index + 1, item.numCovid, moment(item.dateCovid).format("DD/MM/YYYY"), item.statusCovid === true ? "Đang nhiễm" : "Đã hết", item.symptomCovid);
-        generateHr(doc, position + 20, 500);
-        marginTopNextCovid += 20;
-        _countCovid++;
-        if (position > 650) {
-            _countCovid = 0;
-            marginTopNextCovid = 20;
-            doc.addPage();
-        }
-    });
+        generateHr(doc, marginTopNextCovid + 60, 500);
+        // table content
+        doc.font("public/font/times.ttf");
+        let _countCovid = 0; //set for newPage
+        data.covid.forEach((item, index) => {
+            const position = marginTopNextCovid + 60 + (_countCovid + 1) * 15;
+            generateTableRow_Covid(doc, position, 10, index + 1, item.numCovid, moment(item.dateCovid).format("DD/MM/YYYY"), item.statusCovid === true ? "Đang nhiễm" : "Đã hết", item.symptomCovid);
+            generateHr(doc, position + 20, 500);
+            marginTopNextCovid += 20;
+            _countCovid++;
+            if (position > 650) {
+                _countCovid = 0;
+                marginTopNextCovid = 20;
+                doc.addPage();
+            }
+        });
+    } else {
+        doc.fillColor("#444444").font("public/font/timesbd.ttf").fontSize("12").text("Chưa có thông tin tiêm Vaccine!", 50, marginTopNextCovid + 30);
+        marginTopNext = marginTopNextCovid + 60;
+    }
+
 
     // ===========  End Is Covid ==============================
 };

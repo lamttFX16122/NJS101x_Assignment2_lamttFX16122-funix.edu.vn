@@ -63,7 +63,7 @@
                   <%if(isAdmin===true){%>
         <div class="row">
           <div class="col-12 text-end">
-            <a type="button" href="/pdf" class="btn btn-success">Xuất thông tin PDF</a>
+            <a type="button" href="/pdf/?userId=<%=data.userId%>" class="btn btn-success">Xuất thông tin PDF</a>
           </div>
         </div>
         <%}%>
@@ -231,13 +231,13 @@
               <div class="tab-pane fade <%=_activeTab===3? 'active show' : ''%>" id="nav-member" role="tabpanel" aria-labelledby="nav-member">
                 <div class="row pb-3">
                   <div class="col-12 text-end">
-                    <button type="button" class="btn btn-primary btn-register-covid" data-bs-toggle="modal" data-bs-target="#exampleModal_Covid">Thêm thông tin</button>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal_PDF">Chọn xuất PDF theo danh sách </button>
                   </div>
                 </div>
                 <!-- ==========Table Covid=========== -->
                 
                 <%userData.forEach(userItem=>{%>
-                <div class="row border border-info m-0">
+                <div class="row border border-info m-0 mb-2">
                   <div class="card">
                     <div class="card-body">
                       <div class="row align-items-center">
@@ -251,7 +251,7 @@
                         </div>
                         <div class="col-lg-3 col-md-12 col-12">
                           <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#collapseExample-<%=userItem._id%>" aria-expanded="false" aria-controls="collapseExample">Chi tiết</button>
-                          <button class="btn btn-primary">Xuất PDF</button>
+                          <a type="button" href="/pdf/?userId=<%=userItem._id%>" class="btn btn-success">Xuất PDF</a>
                         </div>
                       </div>
                     </div>
@@ -493,6 +493,43 @@
         </div>
         <!-- --------------------- End Modal Covid-------------------->
         
+        <!-- --------------------- Modal PDF--------------------- -->
+        <%if(isAdmin===true){%>
+        <div class="modal fade" id="exampleModal_PDF" tabindex="-1" aria-labelledby="exampleModal_PDF" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Xuất PDF nhân viên</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form class="row g-3 frm-list-pdf" action="/lst-pdf" method="POST">
+                  <div class="row mt-2">
+                    <div class="col-12 text-end">
+                      <button class="btn btn-info" type="button" id="btn-choose-all">Chọn tất cả</button>
+                    </div>
+                  </div>
+                  <span id="err-pdf-list" hidden class="text-danger">Chưa chọn nhân viên!</span>
+                  <ul class="list-group"></ul>
+                  <%userData.forEach(userItem=>{%>
+                  <li class="list-group-item">
+                    <input class="form-check-input check-group" value="<%=userItem._id%>" type="checkbox" name="checkUserId" id="checkUserId" />
+                    <label class="form-check-label" for="checkUserId"> &nbsp;<%=userItem.userName%>-<%=userItem._id%> </label>
+                  </li>
+                  <%})%>
+                  </ul>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-primary">Xuất PDF</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <%}%>
+        <!-- --------------------- End Modal PDF-------------------->
+        
         <!-- ------------------Confirm Remove Hypothermia-------------- -->
         <div class="modal fade" id="exampleModal_confirm_hypothermia" tabindex="-1" aria-labelledby="exampleModal_confirm_hypothermia" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered">
@@ -575,4 +612,4 @@
 <!-- End Container fluid  -->
 <!-- ============================================================== -->
 <%-include('../include/footer.ejs')%> <%-include('../include/end.ejs')%>
-</div>
+      </div>

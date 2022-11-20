@@ -32,6 +32,7 @@ route.post("/remove-covid", _Auth.isUser, _Covid.postRemoveCovid);
 
 // ============= PDF Export=================
 route.get("/pdf", _Auth.isAdmin, _Covid.exportCovidPDF);
+route.post("/lst-pdf", _Auth.isAdmin, _Covid.printListPDF);
 // ============= End PDF Export=============
 
 module.exports = route;

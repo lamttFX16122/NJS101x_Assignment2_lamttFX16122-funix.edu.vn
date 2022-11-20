@@ -243,4 +243,25 @@ $(document).ready(() => {
         $("#remove_isCovid_id").val(_idIsCovid);
     });
     // ======================= End Covid============================
+
+    // ======================= Admin Print PDF list ================
+    $('#btn-choose-all').click(() => {
+        if ($(".check-group").is(':checked')) {
+            $(".check-group").prop('checked', false);
+        }
+        else {
+            $(".check-group").prop('checked', true);
+        }
+    })
+    $('.frm-list-pdf').submit(e => {
+        if (!$(".check-group").is(':checked')) {
+            $('#err-pdf-list').prop('hidden', false);
+        }
+        else {
+            $('#err-pdf-list').prop('hidden', true);
+            return;
+        }
+        e.preventDefault();
+    })
+    // ======================= End Admin Print PDF list ============
 });
