@@ -602,7 +602,7 @@ const generateHypothermiaTable = (doc, data) => {
             }
         });
     } else {
-        doc.fillColor("#444444").font("public/font/timesbd.ttf").fontSize("12").text("Chưa có thông tin tiêm Vaccine!", 50, marginTopNextCovid + 30);
+        doc.fillColor("#444444").font("public/font/timesbd.ttf").fontSize("12").text("Chưa có thông tin nhiễm Covid!", 50, marginTopNextCovid + 30);
         marginTopNext = marginTopNextCovid + 60;
     }
 
