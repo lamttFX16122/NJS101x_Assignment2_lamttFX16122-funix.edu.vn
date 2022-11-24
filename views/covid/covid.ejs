@@ -63,7 +63,7 @@
                   <%if(isAdmin===true){%>
         <div class="row">
           <div class="col-12 text-end">
-            <a type="button" href="/pdf/?userId=<%=data.userId%>" class="btn btn-success">Xuất thông tin PDF</a>
+            <a type="button" href="/pdf/?userId=<%=data.userId?data.userId: ''%>" class="btn btn-success">Xuất thông tin PDF</a>
           </div>
         </div>
         <%}%>

@@ -12,10 +12,10 @@ module.exports.getAddUser = (req, res, next) => {
         title: "Điểm danh",
         img_user: "imagesimage-1667714506718.PNG",
         numActive: 3,
-        isAdmin: req.session.user.isAdmin.admin
+        isAdmin: false
     });
 };
-module.exports.postAddUser = (req, res, next) => {
+module.exports.postAddUser = async (req, res, next) => {
     const image = req.file;
     const errors = validationResult(req);
     if (!image) {
@@ -24,6 +24,11 @@ module.exports.postAddUser = (req, res, next) => {
     bcryptjs
         .hash(req.body.password, 12)
         .then(hashPw => {
+            const newCovid = new _Covid({
+                hypothermia: [],
+                vaccine: [],
+                covid: []
+            })
             const user = new _User({
                 email: req.body.email,
                 password: hashPw,
@@ -40,12 +45,20 @@ module.exports.postAddUser = (req, res, next) => {
                 annualLeave: req.body.annualLeave * 8,
                 image: image.path,
                 ownerId: "636a075e84cc2fea274c5684",
+                covidId: newCovid._id
             });
-            return user.save();
+            // return user.save();
+            user.save()
+                .then(result => {
+                    newCovid.save()
+                        .then(result => {
+                            res.redirect("/login");
+                        })
+                })
         })
-        .then(result => {
-            res.redirect("/login");
-        })
+        // .then(result => {
+
+        // })
         .catch(err => console.log(err));
 };
 //Admember
