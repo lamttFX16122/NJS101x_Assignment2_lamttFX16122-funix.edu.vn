@@ -1,9 +1,9 @@
 /* == Require Lib==*/
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const Mongoose = require('mongoose');
 const path = require('path');
-const moment = require('moment');
 const multer = require('multer');
 const session = require('express-session');
 const mongoDbSession = require('connect-mongodb-session')(session);
@@ -22,10 +22,9 @@ const routeCovid = require('./routers/covid.route');
 /* == Param==*/
 const app = express();
 //db config
-const _DB_URL = 'mongodb+srv://thanhlam:thanhlam@cluster0.hatavqh.mongodb.net/NJS101x_Assignment2?retryWrites=true&w=majority';
 
 const store = new mongoDbSession({
-    uri: _DB_URL,
+    uri: process.env.DB_URL,
     collection: 'sessions'
 });
 const fileStore = multer.diskStorage({
@@ -91,11 +90,10 @@ app.use((req, res, next) => {
 /* == End App Use==*/
 
 /* == DB Connect==*/
-Mongoose.connect(_DB_URL)
+Mongoose.connect(process.env.DB_URL)
     .then(connect => {
-        // app.listen(3002);
-        app.listen(process.env.PORT || 3002, '0.0.0.0', () => {
-            console.log('Connected...');
+        app.listen(process.env.PORT, '0.0.0.0', () => {
+            console.log('Server is running with port ' + process.env.PORT);
         })
     })
     .catch(err => console.log(err));
