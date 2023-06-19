@@ -27,7 +27,7 @@
               <%if(errMes){%>
               <p class="text-center mb-4 text-danger">Email hoặc mật khẩu không hợp lệ!</p>
               <%}%>
-            <%if(flashMes.length>0){%>
+            <%if(flashMes?.length>0){%>
               <p class="text-center mb-4 text-danger"><%=flashMes%></p>
               <%}%>
                                 <form action="/login" method="POST" class="login-form">
